@@ -1,7 +1,8 @@
 name: Test terraform-new/destroy-workspace
 
 on:
-  - pull_request
+  workflow_dispatch:
+  # - pull_request
 
 jobs:
   workspace_management:

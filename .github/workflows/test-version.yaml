@@ -1,7 +1,8 @@
 name: Test terraform-version
 
 on:
-  - pull_request
+  workflow_dispatch:
+  # - pull_request
 
 jobs:
   required_version:

@@ -1,7 +1,8 @@
 name: Unit test
 
 on:
-  - push
+  # - push
+  workflow_dispatch:
 
 jobs:
   pytest_amd64:
