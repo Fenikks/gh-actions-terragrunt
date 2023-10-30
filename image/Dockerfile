@@ -15,19 +15,19 @@ RUN sed -i "s|version='.*'|version=\'${VERSION}\'|" /tmp/setup.py \
  && pip install /tmp \
  && rm -rf /tmp/src /tmp/setup.py
 
-RUN if [ "$FETCH_CHECKSUMS" = "yes" ]; then \
-  TERRAFORM_BIN_CHECKSUM_DIR="/var/terraform" get-terraform-checksums; \
-fi
+# RUN if [ "$FETCH_CHECKSUMS" = "yes" ]; then \
+#   TERRAFORM_BIN_CHECKSUM_DIR="/var/terraform" get-terraform-checksums; \
+# fi
 
-# TARGETARCH is set by the buildx command, which is used for the release image
-# It will not be set when building locally, or when built by GitHub Actions
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-      TERRAFORM_BIN_CACHE_DIR="/var/terraform" TERRAFORM_BIN_CHECKSUM_DIR="/var/terraform" terraform-version 0.9.0 \
-   && TERRAFORM_BIN_CACHE_DIR="/var/terraform" TERRAFORM_BIN_CHECKSUM_DIR="/var/terraform" terraform-version 0.12.0; \
-fi
-RUN if [ "$TARGETARCH" = "arm64" ]; then \
-      TERRAFORM_BIN_CACHE_DIR="/var/terraform" TERRAFORM_BIN_CHECKSUM_DIR="/var/terraform" terraform-version 0.13.5; \
-fi
+# # TARGETARCH is set by the buildx command, which is used for the release image
+# # It will not be set when building locally, or when built by GitHub Actions
+# RUN if [ "$TARGETARCH" = "amd64" ]; then \
+#       TERRAFORM_BIN_CACHE_DIR="/var/terraform" TERRAFORM_BIN_CHECKSUM_DIR="/var/terraform" terraform-version 0.9.0 \
+#    && TERRAFORM_BIN_CACHE_DIR="/var/terraform" TERRAFORM_BIN_CHECKSUM_DIR="/var/terraform" terraform-version 0.12.0; \
+# fi
+# RUN if [ "$TARGETARCH" = "arm64" ]; then \
+#       TERRAFORM_BIN_CACHE_DIR="/var/terraform" TERRAFORM_BIN_CHECKSUM_DIR="/var/terraform" terraform-version 0.13.5; \
+# fi
 
 COPY entrypoints/ /entrypoints/
 COPY actions.sh /usr/local/actions.sh
