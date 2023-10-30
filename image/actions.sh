@@ -70,9 +70,9 @@ function setup() {
         debug_file "$STEP_TMP_DIR/github_comment_react.stderr"
     fi
 
-    export TERRAGRUNT_DOWNLOAD="${INPUT_PATH}/.terragrunt-cache/"
-    export TF_PLUGIN_CACHE_DIR="${INPUT_PATH}/.terragrunt-cache/.plugins"
-    mkdir -p "$TERRAGRUNT_DOWNLOAD" "$TF_PLUGIN_CACHE_DIR" #"$JOB_TMP_DIR/terraform-bin-dir"
+    # export TERRAGRUNT_DOWNLOAD="${INPUT_PATH}/.terragrunt-cache/"
+    # export TF_PLUGIN_CACHE_DIR="${INPUT_PATH}/.terragrunt-cache/.plugins"
+    # mkdir -p "$TERRAGRUNT_DOWNLOAD" "$TF_PLUGIN_CACHE_DIR" #"$JOB_TMP_DIR/terraform-bin-dir"
 
     #unset TF_WORKSPACE
 
