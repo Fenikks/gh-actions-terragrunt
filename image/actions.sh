@@ -72,7 +72,7 @@ function setup() {
 
     export TERRAGRUNT_DOWNLOAD="${INPUT_PATH}/.terragrunt-cache/"
     export TF_PLUGIN_CACHE_DIR="${INPUT_PATH}/.terragrunt-cache/.plugins"
-    mkdir -p "$TF_DATA_DIR" "$TF_PLUGIN_CACHE_DIR" #"$JOB_TMP_DIR/terraform-bin-dir"
+    mkdir -p "$TERRAGRUNT_DOWNLOAD" "$TF_PLUGIN_CACHE_DIR" #"$JOB_TMP_DIR/terraform-bin-dir"
 
     #unset TF_WORKSPACE
 
