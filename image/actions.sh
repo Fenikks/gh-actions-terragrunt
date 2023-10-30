@@ -287,27 +287,27 @@ function set-common-plan-args() {
     export PLAN_ARGS
 }
 
-function set-remote-plan-args() {
-    # set-common-plan-args
+# function set-remote-plan-args() {
+#     # set-common-plan-args
 
-    # local AUTO_TFVARS_COUNTER=0
+#     # local AUTO_TFVARS_COUNTER=0
 
-    # if [[ -n "$INPUT_VAR_FILE" ]]; then
-    #     for file in $(echo "$INPUT_VAR_FILE" | tr ',' '\n'); do
-    #         cp "$file" "$INPUT_PATH/zzzz-dflook-terraform-github-actions-$AUTO_TFVARS_COUNTER.auto.tfvars"
-    #         AUTO_TFVARS_COUNTER=$((AUTO_TFVARS_COUNTER + 1))
-    #     done
-    # fi
+#     # if [[ -n "$INPUT_VAR_FILE" ]]; then
+#     #     for file in $(echo "$INPUT_VAR_FILE" | tr ',' '\n'); do
+#     #         cp "$file" "$INPUT_PATH/zzzz-dflook-terraform-github-actions-$AUTO_TFVARS_COUNTER.auto.tfvars"
+#     #         AUTO_TFVARS_COUNTER=$((AUTO_TFVARS_COUNTER + 1))
+#     #     done
+#     # fi
 
-    # if [[ -n "$INPUT_VARIABLES" ]]; then
-    #     echo "$INPUT_VARIABLES" >"$STEP_TMP_DIR/variables.tfvars"
-    #     cp "$STEP_TMP_DIR/variables.tfvars" "$INPUT_PATH/zzzz-dflook-terraform-github-actions-$AUTO_TFVARS_COUNTER.auto.tfvars"
-    # fi
+#     # if [[ -n "$INPUT_VARIABLES" ]]; then
+#     #     echo "$INPUT_VARIABLES" >"$STEP_TMP_DIR/variables.tfvars"
+#     #     cp "$STEP_TMP_DIR/variables.tfvars" "$INPUT_PATH/zzzz-dflook-terraform-github-actions-$AUTO_TFVARS_COUNTER.auto.tfvars"
+#     # fi
 
-    # debug_cmd ls -la "$INPUT_PATH"
+#     # debug_cmd ls -la "$INPUT_PATH"
 
-    # export PLAN_ARGS
-}
+#     # export PLAN_ARGS
+# }
 
 function output() {
     debug_log $TOOL_COMMAND_NAME output -json
