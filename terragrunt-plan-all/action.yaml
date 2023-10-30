@@ -1,0 +1,58 @@
+name: terragrunt-plan-all
+description: Create a Terraform plan
+author: Alina Freydina
+
+inputs:
+  path:
+    description: Path to the Terraform configuration
+    required: false
+    default: .
+  tg_version:
+    description: Required Terragrunt version
+    required: false
+    default: "0.52.4"
+  tf_version:
+    description: Required Terraform version
+    required: false
+    default: "1.5.7"
+  parallelism:
+    description: Limit the number of concurrent operations
+    required: false
+    default: "0"
+  label:
+    description: A friendly name for this plan
+    required: false
+    default: ""
+  add_github_comment:
+    description: Add the plan to a GitHub PR
+    required: false
+    default: "true"
+  destroy:
+    description: Create a plan to destroy all resources
+    required: false
+    default: "false"
+
+outputs:
+  changes:
+    description: If the generated plan would update any resources or outputs this is set to `true`, otherwise it's set to `false`.
+  to_add:
+    description: The number of resources that would be added by this plan
+  to_change:
+    description: The number of resources that would be changed by this plan
+  to_destroy:
+    description: The number of resources that would be destroyed by this plan
+  text_plan_path:
+    description: Path to a file in the workspace containing the generated plan in human readable format.
+  json_plan_path:
+    description: Path to a file in the workspace containing the generated plan in JSON format.
+  run_id:
+    description: If the root module uses the `remote` or `cloud` backend in remote execution mode, this output will be set to the remote run id.
+
+runs:
+  using: docker
+  image: ../image/Dockerfile
+  entrypoint: /entrypoints/tg_plan_all.sh
+
+branding:
+  icon: globe
+  color: purple
