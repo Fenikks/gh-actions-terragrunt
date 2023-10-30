@@ -73,8 +73,8 @@ jobs:
 
           for action in $(cd $GITHUB_WORKSPACE && find . -name action.yaml -printf "%h\n" | sed 's/^.\///'); do
 
-            if git clone https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/${GITHUB_REPOSITORY_OWNER,,}/$action.git "$HOME/$action"; then
-              echo "Releasing ${GITHUB_REPOSITORY_OWNER,,}/$action@$RELEASE_TAG"
+            if git clone https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY_OWNER/$action.git "$HOME/$action"; then
+              echo "Releasing $GITHUB_REPOSITORY_OWNER/$action@$RELEASE_TAG"
 
         
               # git tags that use GitHub Container Registry for the image
