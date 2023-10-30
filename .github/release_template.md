@@ -1,6 +1,6 @@
-This is one of a suite of terraform related actions - find them at [dflook/terraform-github-actions](https://github.com/dflook/terraform-github-actions).
+This is one of a suite of terragrunt related actions - find them at [$GITHUB_REPOSITORY_OWNER/$REPO_NAME](https://github.com/$GITHUB_REPOSITORY_OWNER/$REPO_NAME).
 
-You can see the changes for this release in the [CHANGELOG](https://github.com/dflook/terraform-github-actions/blob/main/CHANGELOG.md)
+You can see the changes for this release in the [CHANGELOG](https://github.com/$GITHUB_REPOSITORY_OWNER/$REPO_NAME/blob/main/CHANGELOG.md)
 
 You can specify the action version as:
 

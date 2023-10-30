@@ -87,7 +87,7 @@ jobs:
               git -C "$HOME/$action" tag --force -a -m"$RELEASE_TAG" "$RELEASE_TAG"
               git -C "$HOME/$action" tag --force -a -m"$RELEASE_TAG" "$major"
               git -C "$HOME/$action" tag --force -a -m"$RELEASE_TAG" "$major.$minor"
-              git -C "$HOME/$action" push --set-upstream origin ghcr --force
+              git -C "$HOME/$action" push --force
               git -C "$HOME/$action" push --force --tags
 
               # Create the github release
@@ -98,9 +98,9 @@ jobs:
                    --user $GITHUB_ACTOR:${{ secrets.GH_REGISTRY_TOKEN }} \
                    --header "Content-Type: application/json" \
                    --data-binary @- \
-                   "https://api.github.com/repos/$GITHUB_ACTOR/$action/releases"
+                   "https://api.github.com/repos/$GITHUB_REPOSITORY_OWNER/$action/releases"
 
             else
-              echo "Skipping $GITHUB_ACTOR/$action"
+              echo "Skipping $GITHUB_REPOSITORY_OWNER/$action"
             fi
           done
