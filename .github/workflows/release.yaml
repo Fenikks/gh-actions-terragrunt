@@ -72,7 +72,7 @@ jobs:
           }
 
           for action in $(cd $GITHUB_WORKSPACE && find . -name action.yaml -printf "%h\n" | sed 's/^.\///'); do
-
+            echo "git clone https://$GITHUB_ACTOR:GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY_OWNER/$action.git"
             if git clone https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY_OWNER/$action.git "$HOME/$action"; then
               echo "Releasing $GITHUB_REPOSITORY_OWNER/$action@$RELEASE_TAG"
 
