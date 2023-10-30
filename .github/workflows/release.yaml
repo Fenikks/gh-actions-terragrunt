@@ -78,7 +78,6 @@ jobs:
 
         
               # git tags that use GitHub Container Registry for the image
-              git -C "$HOME/$action" checkout ghcr || git -C "$HOME/$action" checkout -b ghcr
               prepare_release
               sed -i "s|  image:.*|  image: docker://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$REPO_NAME@${{ steps.image_build.outputs.digest }}|" $HOME/$action/action.yaml
           
