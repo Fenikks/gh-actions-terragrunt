@@ -80,7 +80,7 @@ jobs:
               # git tags that use GitHub Container Registry for the image
               git -C "$HOME/$action" checkout ghcr || git -C "$HOME/$action" checkout -b ghcr
               prepare_release
-              sed -i 's|  image:.*|  image: docker://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$REPO_NAME@${{ steps.image_build.outputs.digest }}|' $HOME/$action/action.yaml
+              sed -i "s|  image:.*|  image: docker://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$REPO_NAME@${{ steps.image_build.outputs.digest }}|" $HOME/$action/action.yaml
           
               git -C "$HOME/$action" add -A
               git -C "$HOME/$action" commit -m "$RELEASE_TAG"
@@ -95,7 +95,7 @@ jobs:
                | envsubst \
                | jq --slurp --raw-input --arg RELEASE_TAG "$RELEASE_TAG" '{"tag_name": $RELEASE_TAG, "name": $RELEASE_TAG, "body": . }' \
                | curl -X POST \
-                   --user $GITHUB_ACTOR:$GITHUB_TOKEN \
+                   --user $GITHUB_ACTOR:${{ secrets.GH_REGISTRY_TOKEN }} \
                    --header "Content-Type: application/json" \
                    --data-binary @- \
                    "https://api.github.com/repos/$GITHUB_ACTOR/$action/releases"
