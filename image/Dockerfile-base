@@ -12,7 +12,7 @@ FROM debian:bullseye-slim as base
 ENV CHECKPOINT_DISABLE=true
 ENV TF_IN_AUTOMATION=true
 ENV TF_INPUT=false
-ENV TF_PLUGIN_CACHE_DIR=/usr/local/share/terraform/plugin-cache
+# ENV TF_PLUGIN_CACHE_DIR=/usr/local/share/terraform/plugin-cache
 
 RUN apt-get update  \
  && apt-get install --no-install-recommends -y \
