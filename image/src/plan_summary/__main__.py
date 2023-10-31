@@ -35,13 +35,9 @@ def main() -> None:
     # Find all matches in the plan
     matches = re.finditer(pattern, plan, re.MULTILINE)
 
-    # Iterate through the matches and process each one
-    for match in matches:
-        output('to_add', match.group(1))
-        output('to_change', match.group(2))
-        output('to_destroy', match.group(3))
-
-
+    output('to_add', sum(int(match[0]) for match in matches))
+    output('to_change', sum(int(match[1]) for match in matches))
+    output('to_destroy', sum(int(match[2]) for match in matches))
 
 if __name__ == '__main__':
     sys.exit(main())
