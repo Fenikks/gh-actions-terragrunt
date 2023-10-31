@@ -1,4 +1,8 @@
-FROM danielflook/terraform-github-actions-base:latest
+ARG FROM_REGISTRY
+ARG FROM_REPO
+ARG FROM_IMAGE
+
+FROM $FROM_REGISTRY/$FROM_REPO/$FROM_IMAGE:latest
 
 ARG TARGETARCH
 
