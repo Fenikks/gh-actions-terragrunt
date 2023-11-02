@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.2.0...v0.3.0) (2023-11-02)
+
+
+### Features
+
+* updated update_summary ([5a6a40e](https://github.com/Fenikks/gh-actions-terragrunt/commit/5a6a40ee900dd56e77cb5eea18208498e1f7f067))
+
 ## [0.2.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.1.0...v0.2.0) (2023-11-02)
 
 
