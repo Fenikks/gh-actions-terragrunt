@@ -2,7 +2,7 @@ import json
 import os
 import re
 from json import JSONDecodeError
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 from github_actions.api import IssueUrl, GithubApi, CommentUrl
 from github_actions.debug import debug
@@ -42,12 +42,12 @@ class TerraformComment:
 
     """
 
-    def __init__(self, *, issue_url: IssueUrl, comment_url: Optional[CommentUrl], headers: dict[str, str], description: str, summary: str, body: str, status: str):
+    def __init__(self, *, issue_url: IssueUrl, comment_url: Optional[CommentUrl], headers: dict[str, str], description: str, summary: List[str], body: str, status: str):
         self._issue_url = issue_url
         self._comment_url = comment_url
         self._headers = headers
         self._description = description.strip()
-        self._summary = summary.strip()
+        self._summary = summary
         self._body = body.strip()
         self._status = status.strip()
 
@@ -321,7 +321,7 @@ def update_comment(
     *,
     headers: dict[str, str] = None,
     description: str = None,
-    summary: str = None,
+    summary: List[str] = None,
     body: str = None,
     status: str = None
 ) -> TerraformComment:
