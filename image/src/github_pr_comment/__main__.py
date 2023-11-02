@@ -79,41 +79,8 @@ def format_classic_description(action_inputs: PlanPrInputs) -> str:
 
     label = f'Terraform plan in __{action_inputs["INPUT_PATH"]}__'
 
-    # if action_inputs["INPUT_WORKSPACE"] != 'default':
-    #     label += f' in the __{action_inputs["INPUT_WORKSPACE"]}__ workspace'
-
-    # if action_inputs["INPUT_TARGET"]:
-    #     label += '\nTargeting resources: '
-    #     label += ', '.join(f'`{res.strip()}`' for res in action_inputs['INPUT_TARGET'].splitlines())
-
-    # if action_inputs["INPUT_REPLACE"]:
-    #     label += '\nReplacing resources: '
-    #     label += ', '.join(f'`{res.strip()}`' for res in action_inputs['INPUT_REPLACE'].splitlines())
-
     if backend_config := _mask_backend_config(action_inputs):
         label += f'\nWith backend config: `{backend_config}`'
-
-    # if action_inputs["INPUT_BACKEND_CONFIG_FILE"]:
-    #     label += f'\nWith backend config files: `{action_inputs["INPUT_BACKEND_CONFIG_FILE"]}`'
-
-    # if action_inputs["INPUT_VAR"]:
-    #     label += f'\nWith vars: `{action_inputs["INPUT_VAR"]}`'
-
-    # if action_inputs["INPUT_VAR_FILE"]:
-    #     label += f'\nWith var files: `{action_inputs["INPUT_VAR_FILE"]}`'
-
-#     if action_inputs["INPUT_VARIABLES"]:
-#         stripped_vars = action_inputs["INPUT_VARIABLES"].strip()
-#         if '\n' in stripped_vars:
-#             label += f'''<details><summary>With variables</summary>
-
-# ```hcl
-# {stripped_vars}
-# ```
-# </details>
-# '''
-#         else:
-#             label += f'\nWith variables: `{stripped_vars}`'
 
     return label
 
@@ -128,78 +95,35 @@ def format_description(action_inputs: PlanPrInputs, sensitive_variables: List[st
 
     label = f'{ToolProductName} plan in __{action_inputs["INPUT_PATH"]}__'
 
-    # if action_inputs["INPUT_WORKSPACE"] != 'default':
-    #     label += f' in the __{action_inputs["INPUT_WORKSPACE"]}__ workspace'
-
     label += mode
-
-    # if action_inputs["INPUT_TARGET"]:
-    #     label += '\nTargeting resources: '
-    #     label += ', '.join(f'`{res.strip()}`' for res in action_inputs['INPUT_TARGET'].splitlines())
-
-    # if action_inputs["INPUT_REPLACE"]:
-    #     label += '\nReplacing resources: '
-    #     label += ', '.join(f'`{res.strip()}`' for res in action_inputs['INPUT_REPLACE'].splitlines())
 
     if backend_config := _mask_backend_config(action_inputs):
         label += f'\nWith backend config: `{backend_config}`'
 
-    # if action_inputs["INPUT_BACKEND_CONFIG_FILE"]:
-    #     label += f'\nWith backend config files: `{action_inputs["INPUT_BACKEND_CONFIG_FILE"]}`'
-
-    # if action_inputs["INPUT_VAR"]:
-    #     label += f'\n:warning: Using deprecated var input. Use the variables input instead.'
-    #     if any(var_name in action_inputs["INPUT_VAR"] for var_name in sensitive_variables):
-    #         label += f'\nWith vars: (sensitive values)'
-    #     else:
-    #         label += f'\nWith vars: `{action_inputs["INPUT_VAR"]}`'
-
-#     if action_inputs["INPUT_VAR_FILE"]:
-#         label += f'\nWith var files: `{action_inputs["INPUT_VAR_FILE"]}`'
-
-#     if action_inputs["INPUT_VARIABLES"]:
-#         variables = hcl.loads(action_inputs["INPUT_VARIABLES"])
-
-#         # mark sensitive variables
-#         variables = {name: Sensitive() if name in sensitive_variables else value for name, value in variables.items()}
-
-#         stripped_vars = render_argument_list(variables).strip()
-#         if '\n' in stripped_vars:
-#             label += f'''<details open><summary>With variables</summary>
-
-# ```hcl
-# {stripped_vars}
-# ```
-# </details>
-# '''
-#         else:
-#             label += f'\nWith variables: `{stripped_vars}`'
-
     return label
 
-def create_summary(plan: Plan, changes: bool=True) -> Optional[str]:
-    summary = None
-
+def create_summary(plan: Plan, changes: bool=True) -> Optional[List[str]]:
+    summary = []
     to_move = 0
 
     for line in plan.splitlines():
         if line.startswith('No changes') or line.startswith('Error'):
-            return line
+            summary.append(line)
 
         if re.match(r'  # \S+ has moved to \S+$', line):
             to_move += 1
 
         if line.startswith('Plan:'):
-            summary = line
+            summary.append(line)
 
             if to_move and 'move' not in summary:
-                summary = summary.rstrip('.') + f', {to_move} to move.'
+                summary[-1] = summary[-1].rstrip('.') + f', {to_move} to move.'
 
         if line.startswith('Changes to Outputs'):
             if summary:
-                return summary + ' Changes to Outputs.'
+                summary[-1] = summary[-1] + ' Changes to Outputs.'
             else:
-                return 'Changes to Outputs.'
+                summary.append('Changes to Outputs')
 
     if summary:
         return summary
