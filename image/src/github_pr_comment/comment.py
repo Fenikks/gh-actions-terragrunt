@@ -328,7 +328,7 @@ def update_comment(
 
     new_headers = headers if headers is not None else comment.headers
     new_headers['version'] = version
-    new_summary = "\n".join(summary) if summary is not None else comment.summary
+    new_summary = "\n\n".join(summary) if summary is not None else comment.summary
 
     new_comment = TerraformComment(
         issue_url=comment.issue_url,
