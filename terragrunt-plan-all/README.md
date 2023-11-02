@@ -209,8 +209,8 @@ jobs:
         with:
           ref: refs/pull/${{ github.event.issue.number }}/merge
 
-      - name: terraform apply
-        uses: dflook/terraform-plan@v1
+      - name: terragrung plan
+        uses: Fenikks/terragrunt-plan-all@v.0.0.2
         with:
           path: my-terraform-config
 ```
@@ -258,45 +258,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: terraform plan
+      - name: terragrunt plan
         uses: Fenikks/terragrunt-plan-all@v1
         with:
           path: my-terraform-config
-```
-
-### A full example of inputs
-
-This example workflow demonstrates most of the available inputs:
-- The environment variables are set at the workflow level.
-- The PR comment will be labelled `production`, and the plan will use the `prod` workspace.
-- Variables are read from `env/prod.tfvars`, with `turbo_mode` overridden to `true`.
-- The backend config is taken from `env/prod.backend`, and the token is set from a secret.
-
-```yaml
-name: PR Plan
-
-on: [pull_request]
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-permissions:
-  contents: read
-  pull-requests: write
-
-jobs:
-  plan:
-    runs-on: ubuntu-latest
-    name: Create Terraform plan
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: terraform plan
-        uses: Fenikks/terragrunt-plan-all@v1
-        with:
-          path: my-terraform-config
-          label: production
 ```
 
 ### Generating a plan using a comment
@@ -328,7 +293,7 @@ jobs:
           ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - name: terraform plan
-        uses: dflook/terraform-plan@v1
+        uses: Fenikks/terragrunt-plan-all@v.0.0.2
         with:
           path: my-terraform-config
 ```

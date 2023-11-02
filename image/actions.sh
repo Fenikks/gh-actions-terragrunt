@@ -15,40 +15,6 @@ function debug() {
     echo
 }
 
-function test-terraform-version() {
-    local OP="$1"
-    local VER="$2"
-
-    python3 -c "exit(0 if ($TERRAFORM_VER_MAJOR, $TERRAFORM_VER_MINOR, $TERRAFORM_VER_PATCH) $OP tuple(int(v) for v in '$VER'.split('.')) else 1)"
-}
-
-function job_markdown_ref() {
-    echo "[${GITHUB_WORKFLOW} #${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
-}
-
-function detect-tfmask() {
-    TFMASK="tfmask"
-    if ! hash tfmask 2>/dev/null; then
-        TFMASK="cat"
-    fi
-
-    export TFMASK
-}
-
-function execute_run_commands() {
-    if [[ -v TERRAFORM_PRE_RUN ]]; then
-        start_group "Executing TERRAFORM_PRE_RUN"
-
-        echo "Executing init commands specified in 'TERRAFORM_PRE_RUN' environment variable"
-        printf "%s" "$TERRAFORM_PRE_RUN" >"$STEP_TMP_DIR/TERRAFORM_PRE_RUN.sh"
-        disable_workflow_commands
-        bash -xeo pipefail "$STEP_TMP_DIR/TERRAFORM_PRE_RUN.sh"
-        enable_workflow_commands
-
-        end_group
-    fi
-}
-
 function setup() {
     if [[ "$INPUT_PATH" == "" ]]; then
         error_log "input 'path' not set"
@@ -70,14 +36,6 @@ function setup() {
         debug_file "$STEP_TMP_DIR/github_comment_react.stderr"
     fi
 
-    # export TERRAGRUNT_DOWNLOAD="${INPUT_PATH}/.terragrunt-cache/"
-    # export TF_PLUGIN_CACHE_DIR="${INPUT_PATH}/.terragrunt-cache/.plugins"
-    # mkdir -p "$TERRAGRUNT_DOWNLOAD" "$TF_PLUGIN_CACHE_DIR" #"$JOB_TMP_DIR/terraform-bin-dir"
-
-    #unset TF_WORKSPACE
-
-    #write_credentials
-
     start_group "Installing Terragrunt and Terraform"
 
     # install terragrung and terraform
@@ -86,14 +44,10 @@ function setup() {
     
     if [[ -v INPUT_TG_VERSION ]]; then
       TG_VERSION=$INPUT_TG_VERSION
-    # else 
-    #   TG_VERSION="0.52.4"
     fi
 
     if [[ -v INPUT_TF_VERSION ]]; then
       TF_VERSION=$INPUT_TF_VERSION
-    # else 
-    #   TG_VERSION="1.5.7"
     fi
 
     curl -Lo /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64"
@@ -102,19 +56,104 @@ function setup() {
     unzip /tmp/terraform_${TF_VERSION}_linux_amd64.zip -d /usr/local/bin/
     chmod +x /usr/local/bin/terraform
 
-
-    # readonly TERRAFORM_BACKEND_TYPE=$(terraform-backend)
-    # if [[ "$TERRAFORM_BACKEND_TYPE" != "" ]]; then
-    #     echo "Detected $TERRAFORM_BACKEND_TYPE backend"
-    # fi
-    # export TERRAFORM_BACKEND_TYPE
-
     end_group
 
     detect-tfmask
 
     # execute_run_commands
 }
+
+function set-common-plan-args() {
+    PLAN_ARGS=""
+    PARALLEL_ARG=""
+
+    if [[ "$INPUT_PARALLELISM" -ne 0 ]]; then
+        PARALLEL_ARG="--terragrunt-parallelism $INPUT_PARALLELISM"
+    fi
+
+    if [[ -v INPUT_DESTROY ]]; then
+        if [[ "$INPUT_DESTROY" == "true" ]]; then
+            PLAN_ARGS="$PLAN_ARGS -destroy"
+        fi
+    fi
+    export PLAN_ARGS
+}
+
+function plan() {
+
+    local PLAN_OUT_ARG
+    if [[ -n "$PLAN_OUT" ]]; then
+        PLAN_OUT_ARG="-out=$PLAN_OUT"
+    else
+        PLAN_OUT_ARG=""
+    fi
+
+    # shellcheck disable=SC2086
+    debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG $PLAN_OUT_ARG '$PLAN_ARGS'  # don't expand PLAN_ARGS
+
+    set +e
+    # shellcheck disable=SC2086
+    (cd "$INPUT_PATH" && terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG $PLAN_OUT_ARG $PLAN_ARGS) \
+        2>"$STEP_TMP_DIR/terraform_plan.stderr" \
+        | $TFMASK \
+        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_plan.stdout" \
+        | compact_plan \
+            >"$STEP_TMP_DIR/plan.txt"
+
+    # shellcheck disable=SC2034
+    PLAN_EXIT=${PIPESTATUS[0]}
+    set -e
+}
+
+function job_markdown_ref() {
+    echo "[${GITHUB_WORKFLOW} #${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+}
+
+function detect-tfmask() {
+    TFMASK="tfmask"
+    if ! hash tfmask 2>/dev/null; then
+        TFMASK="cat"
+    fi
+
+    export TFMASK
+}
+
+
+
+
+
+
+
+
+
+
+
+
+function test-terraform-version() {
+    local OP="$1"
+    local VER="$2"
+
+    python3 -c "exit(0 if ($TERRAFORM_VER_MAJOR, $TERRAFORM_VER_MINOR, $TERRAFORM_VER_PATCH) $OP tuple(int(v) for v in '$VER'.split('.')) else 1)"
+}
+
+
+
+
+function execute_run_commands() {
+    if [[ -v TERRAFORM_PRE_RUN ]]; then
+        start_group "Executing TERRAFORM_PRE_RUN"
+
+        echo "Executing init commands specified in 'TERRAFORM_PRE_RUN' environment variable"
+        printf "%s" "$TERRAFORM_PRE_RUN" >"$STEP_TMP_DIR/TERRAFORM_PRE_RUN.sh"
+        disable_workflow_commands
+        bash -xeo pipefail "$STEP_TMP_DIR/TERRAFORM_PRE_RUN.sh"
+        enable_workflow_commands
+
+        end_group
+    fi
+}
+
+
 
 function relative_to() {
     local absbase
@@ -163,167 +202,6 @@ function set-init-args() {
     export INIT_ARGS
 }
 
-##
-# Initialize the backend for a specific workspace
-#
-# The workspace must already exist, or the job will be failed
-function init-backend-workspace() {
-    start_group "Initializing $TOOL_PRODUCT_NAME"
-
-    set-init-args
-
-    rm -rf "$TF_DATA_DIR"
-
-    debug_log TF_WORKSPACE=$INPUT_WORKSPACE $TOOL_COMMAND_NAME init -input=false '$INIT_ARGS'  # don't expand INIT_ARGS
-
-    set +e
-    # shellcheck disable=SC2086
-    (cd "$INPUT_PATH" && TF_WORKSPACE=$INPUT_WORKSPACE $TOOL_COMMAND_NAME init -input=false $INIT_ARGS \
-        2>"$STEP_TMP_DIR/terraform_init.stderr")
-
-    local INIT_EXIT=$?
-    set -e
-
-    if [[ $INIT_EXIT -eq 0 ]]; then
-        cat "$STEP_TMP_DIR/terraform_init.stderr" >&2
-    else
-        if grep -q "No existing workspaces." "$STEP_TMP_DIR/terraform_init.stderr" || grep -q "Failed to select workspace" "$STEP_TMP_DIR/terraform_init.stderr" || grep -q "Currently selected workspace.*does not exist" "$STEP_TMP_DIR/terraform_init.stderr"; then
-            # Couldn't select workspace, but we don't really care.
-            # select-workspace will give a better error if the workspace is required to exist
-            cat "$STEP_TMP_DIR/terraform_init.stderr"
-        else
-            cat "$STEP_TMP_DIR/terraform_init.stderr" >&2
-            exit $INIT_EXIT
-        fi
-    fi
-
-    end_group
-
-    select-workspace
-}
-
-##
-# Initialize terraform to use the default workspace
-#
-# This can be used to initialize when you don't know if a given workspace exists
-# This can NOT be used with remote backend, as they have no default workspace
-function init-backend-default-workspace() {
-    start_group "Initializing $TOOL_PRODUCT_NAME"
-
-    set-init-args
-
-    rm -rf "$TF_DATA_DIR"
-
-    debug_log $TOOL_COMMAND_NAME init -input=false '$INIT_ARGS'  # don't expand INIT_ARGS
-    set +e
-    # shellcheck disable=SC2086
-    (cd "$INPUT_PATH" && $TOOL_COMMAND_NAME init -input=false $INIT_ARGS \
-        2>"$STEP_TMP_DIR/terraform_init.stderr")
-
-    local INIT_EXIT=$?
-    set -e
-
-    if [[ $INIT_EXIT -eq 0 ]]; then
-        cat "$STEP_TMP_DIR/terraform_init.stderr" >&2
-    else
-        if grep -q "No existing workspaces." "$STEP_TMP_DIR/terraform_init.stderr" || grep -q "Failed to select workspace" "$STEP_TMP_DIR/terraform_init.stderr" || grep -q "Currently selected workspace.*does not exist" "$STEP_TMP_DIR/terraform_init.stderr"; then
-            # Couldn't select workspace, but we don't really care.
-            # select-workspace will give a better error if the workspace is required to exist
-            cat "$STEP_TMP_DIR/terraform_init.stderr"
-        else
-            cat "$STEP_TMP_DIR/terraform_init.stderr" >&2
-            exit $INIT_EXIT
-        fi
-    fi
-
-    end_group
-}
-
-function select-workspace() {
-    local WORKSPACE_EXIT
-
-    debug_log $TOOL_COMMAND_NAME workspace select "$INPUT_WORKSPACE"
-    set +e
-    (cd "$INPUT_PATH" && $TOOL_COMMAND_NAME workspace select "$INPUT_WORKSPACE") >"$STEP_TMP_DIR/workspace_select" 2>&1
-    WORKSPACE_EXIT=$?
-    set -e
-
-    if [[ -s "$STEP_TMP_DIR/workspace_select" ]]; then
-        start_group "Selecting workspace"
-
-        if [[ $WORKSPACE_EXIT -ne 0 ]] && grep -q "workspaces not supported" "$STEP_TMP_DIR/workspace_select" && [[ $INPUT_WORKSPACE == "default" ]]; then
-            echo "The full name of a remote workspace is set by the terraform configuration, selecting a different one is not supported"
-            WORKSPACE_EXIT=0
-        elif [[ $WORKSPACE_EXIT -ne 0 && "$TERRAFORM_BACKEND_TYPE" == "cloud" ]]; then
-            # workspace select doesn't work with partial cloud config, we'll just have to try it and see
-            echo "Using the $INPUT_WORKSPACE workspace"
-            export TF_WORKSPACE="$INPUT_WORKSPACE"
-            WORKSPACE_EXIT=0
-        else
-            cat "$STEP_TMP_DIR/workspace_select"
-        fi
-
-        end_group
-    fi
-
-    if [[ $WORKSPACE_EXIT -ne 0 ]]; then
-        exit $WORKSPACE_EXIT
-    fi
-}
-
-function set-common-plan-args() {
-    PLAN_ARGS=""
-    PARALLEL_ARG=""
-
-    if [[ "$INPUT_PARALLELISM" -ne 0 ]]; then
-        PARALLEL_ARG="--terragrunt-parallelism $INPUT_PARALLELISM"
-    fi
-
-    if [[ -v INPUT_DESTROY ]]; then
-        if [[ "$INPUT_DESTROY" == "true" ]]; then
-            PLAN_ARGS="$PLAN_ARGS -destroy"
-        fi
-    fi
-    export PLAN_ARGS
-}
-
-# function set-remote-plan-args() {
-#     # set-common-plan-args
-
-#     # local AUTO_TFVARS_COUNTER=0
-
-#     # if [[ -n "$INPUT_VAR_FILE" ]]; then
-#     #     for file in $(echo "$INPUT_VAR_FILE" | tr ',' '\n'); do
-#     #         cp "$file" "$INPUT_PATH/zzzz-dflook-terraform-github-actions-$AUTO_TFVARS_COUNTER.auto.tfvars"
-#     #         AUTO_TFVARS_COUNTER=$((AUTO_TFVARS_COUNTER + 1))
-#     #     done
-#     # fi
-
-#     # if [[ -n "$INPUT_VARIABLES" ]]; then
-#     #     echo "$INPUT_VARIABLES" >"$STEP_TMP_DIR/variables.tfvars"
-#     #     cp "$STEP_TMP_DIR/variables.tfvars" "$INPUT_PATH/zzzz-dflook-terraform-github-actions-$AUTO_TFVARS_COUNTER.auto.tfvars"
-#     # fi
-
-#     # debug_cmd ls -la "$INPUT_PATH"
-
-#     # export PLAN_ARGS
-# }
-
-function output() {
-    debug_log $TOOL_COMMAND_NAME output -json
-    (cd "$INPUT_PATH" && $TOOL_COMMAND_NAME output -json | convert_output)
-}
-
-function update_status() {
-    local status="$1"
-
-    if ! STATUS="$status" github_pr_comment status 2>"$STEP_TMP_DIR/github_pr_comment.stderr"; then
-        debug_file "$STEP_TMP_DIR/github_pr_comment.stderr"
-    else
-        debug_file "$STEP_TMP_DIR/github_pr_comment.stderr"
-    fi
-}
-
 function random_string() {
     python3 -c "import random; import string; print(''.join(random.choice(string.ascii_lowercase) for i in range(8)))"
 }
@@ -343,47 +221,7 @@ function write_credentials() {
     debug_cmd git config --list
 }
 
-function plan() {
 
-    local PLAN_OUT_ARG
-    if [[ -n "$PLAN_OUT" ]]; then
-        PLAN_OUT_ARG="-out=$PLAN_OUT"
-    else
-        PLAN_OUT_ARG=""
-    fi
-
-    # shellcheck disable=SC2086
-    debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG $PLAN_OUT_ARG '$PLAN_ARGS'  # don't expand PLAN_ARGS
-
-    set +e
-    # shellcheck disable=SC2086
-    (cd "$INPUT_PATH" && terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG $PLAN_OUT_ARG $PLAN_ARGS) \
-        2>"$STEP_TMP_DIR/terraform_plan.stderr" \
-        | $TFMASK \
-        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_plan.stdout" \
-        | compact_plan \
-            >"$STEP_TMP_DIR/plan.txt"
-
-    # shellcheck disable=SC2034
-    PLAN_EXIT=${PIPESTATUS[0]}
-    set -e
-}
-
-function destroy() {
-    # shellcheck disable=SC2086
-    debug_log $TOOL_COMMAND_NAME destroy -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS
-
-    set +e
-    # shellcheck disable=SC2086
-    (cd "$INPUT_PATH" && $TOOL_COMMAND_NAME destroy -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS) \
-        2>"$STEP_TMP_DIR/terraform_destroy.stderr" \
-        | tee /dev/fd/3 \
-            >"$STEP_TMP_DIR/terraform_destroy.stdout"
-
-    # shellcheck disable=SC2034
-    DESTROY_EXIT=${PIPESTATUS[0]}
-    set -e
-}
 
 function force_unlock() {
     echo "Unlocking state with ID: $INPUT_LOCK_ID"
@@ -393,15 +231,15 @@ function force_unlock() {
 
 function fix_owners() {
     debug_cmd ls -la "$GITHUB_WORKSPACE"
-    if [[ -d "$GITHUB_WORKSPACE/.dflook-terraform-github-actions" ]]; then
-        chown -R --reference "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/.dflook-terraform-github-actions" || true
-        debug_cmd ls -la "$GITHUB_WORKSPACE/.dflook-terraform-github-actions"
+    if [[ -d "$GITHUB_WORKSPACE/.gh-actions-terragrunt" ]]; then
+        chown -R --reference "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/.gh-actions-terragrunt" || true
+        debug_cmd ls -la "$GITHUB_WORKSPACE/.gh-actions-terragrunt"
     fi
 
     debug_cmd ls -la "$HOME"
-    if [[ -d "$HOME/.dflook-terraform-github-actions" ]]; then
-        chown -R --reference "$HOME" "$HOME/.dflook-terraform-github-actions" || true
-        debug_cmd ls -la "$HOME/.dflook-terraform-github-actions"
+    if [[ -d "$HOME/.gh-actions-terragrunt" ]]; then
+        chown -R --reference "$HOME" "$HOME/.gh-actions-terragrunt" || true
+        debug_cmd ls -la "$HOME/.gh-actions-terragrunt"
     fi
     if [[ -d "$HOME/.terraform.d" ]]; then
         chown -R --reference "$HOME" "$HOME/.terraform.d" || true
@@ -409,14 +247,14 @@ function fix_owners() {
     fi
 
     if [[ -d "$INPUT_PATH" ]]; then
-        debug_cmd find "$INPUT_PATH" -regex '.*/zzzz-dflook-terraform-github-actions-[0-9]+\.auto\.tfvars' -print -delete || true
+        debug_cmd find "$INPUT_PATH" -regex '.*/zzzz-gh-actions-terragrunt-[0-9]+\.auto\.tfvars' -print -delete || true
     fi
 }
 
 # Every file written to disk should use one of these directories
 STEP_TMP_DIR="/tmp"
-JOB_TMP_DIR="$HOME/.dflook-terraform-github-actions"
-WORKSPACE_TMP_DIR=".dflook-terraform-github-actions/$(random_string)"
+JOB_TMP_DIR="$HOME/.gh-actions-terragrunt"
+WORKSPACE_TMP_DIR=".gh-actions-terragrunt/$(random_string)"
 readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR
 export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR
 

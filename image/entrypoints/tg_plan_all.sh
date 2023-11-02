@@ -90,20 +90,20 @@ mkdir -p "$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR"
 cp "$STEP_TMP_DIR/plan.txt" "$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR/plan.txt"
 set_output text_plan_path "$WORKSPACE_TMP_DIR/plan.txt"
 
-# if [[ -n "$PLAN_OUT" ]]; then
-#     if (cd "$INPUT_PATH" && terragrunt show -json "$PLAN_OUT") >"$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR/plan.json" 2>"$STEP_TMP_DIR/terraform_show.stderr"; then
+if [[ -n "$PLAN_OUT" ]]; then
+    if (cd "$INPUT_PATH" && terragrunt show -json "$PLAN_OUT") >"$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR/plan.json" 2>"$STEP_TMP_DIR/terraform_show.stderr"; then
+        set_output json_plan_path "$WORKSPACE_TMP_DIR/plan.json"
+    else
+        debug_file "$STEP_TMP_DIR/terraform_show.stderr"
+    fi
+# elif [[ -n "$RUN_ID" ]]; then
+#     if terraform-cloud-state "$RUN_ID" >"$STEP_TMP_DIR/terraform_cloud_state.stdout" 2>"$STEP_TMP_DIR/terraform_cloud_state.stderr"; then
+#         debug_log "Fetched JSON plan from TFC"
+#         cp "$STEP_TMP_DIR/terraform_cloud_state.stdout" "$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR/plan.json"
 #         set_output json_plan_path "$WORKSPACE_TMP_DIR/plan.json"
 #     else
-#         debug_file "$STEP_TMP_DIR/terraform_show.stderr"
+#         debug_log "Failed to fetch JSON plan from TFC"
+#         debug_file "$STEP_TMP_DIR/terraform_cloud_state.stdout"
+#         debug_file "$STEP_TMP_DIR/terraform_cloud_state.stderr"
 #     fi
-# # elif [[ -n "$RUN_ID" ]]; then
-# #     if terraform-cloud-state "$RUN_ID" >"$STEP_TMP_DIR/terraform_cloud_state.stdout" 2>"$STEP_TMP_DIR/terraform_cloud_state.stderr"; then
-# #         debug_log "Fetched JSON plan from TFC"
-# #         cp "$STEP_TMP_DIR/terraform_cloud_state.stdout" "$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR/plan.json"
-# #         set_output json_plan_path "$WORKSPACE_TMP_DIR/plan.json"
-# #     else
-# #         debug_log "Failed to fetch JSON plan from TFC"
-# #         debug_file "$STEP_TMP_DIR/terraform_cloud_state.stdout"
-# #         debug_file "$STEP_TMP_DIR/terraform_cloud_state.stderr"
-# #     fi
-# fi
+fi
