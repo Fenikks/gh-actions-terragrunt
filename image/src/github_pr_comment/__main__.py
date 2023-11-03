@@ -395,8 +395,8 @@ def main() -> int:
 
         headers = comment.headers.copy()
         headers['plan_job_ref'] = job_workflow_ref()
-        headers['plan_hash'] = plan_hash(body, comment.issue_url)
-        headers['plan_text_format'], plan_text = format_plan_text(body)
+#        headers['plan_hash'] = plan_hash(body, comment.issue_url)
+#        headers['plan_text_format'], plan_text = format_plan_text(body)
 
         # changes = os.environ.get('TF_CHANGES') == 'true'
 
