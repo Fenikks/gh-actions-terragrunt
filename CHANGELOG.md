@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.5.0...v0.6.0) (2023-11-03)
+
+
+### Features
+
+* update plan function ([9b9fea6](https://github.com/Fenikks/gh-actions-terragrunt/commit/9b9fea6ce9448e2187848fecd14e0f4380048be1))
+
 ## [0.5.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.4.0...v0.5.0) (2023-11-02)
 
 
