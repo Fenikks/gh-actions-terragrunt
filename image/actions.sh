@@ -2,16 +2,6 @@
 
 set -euo pipefail
 
-# Every file written to disk should use one of these directories
-STEP_TMP_DIR="/tmp"
-PLAN_OUT_DIR="/tmp/plan"
-JOB_TMP_DIR="$HOME/.gh-actions-terragrunt"
-WORKSPACE_TMP_DIR=".gh-actions-terragrunt/$(random_string)"
-mkdir -p $PLAN_OUT_DIR
-readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR
-export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR
-
-
 # shellcheck source=../workflow_commands.sh
 source /usr/local/workflow_commands.sh
 
@@ -260,5 +250,14 @@ function fix_owners() {
         debug_cmd find "$INPUT_PATH" -regex '.*/zzzz-gh-actions-terragrunt-[0-9]+\.auto\.tfvars' -print -delete || true
     fi
 }
+
+# Every file written to disk should use one of these directories
+STEP_TMP_DIR="/tmp"
+PLAN_OUT_DIR="/tmp/plan"
+JOB_TMP_DIR="$HOME/.gh-actions-terragrunt"
+WORKSPACE_TMP_DIR=".gh-actions-terragrunt/$(random_string)"
+mkdir -p $PLAN_OUT_DIR
+readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR
+export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR
 
 trap fix_owners EXIT
