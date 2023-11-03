@@ -28,7 +28,7 @@ fi
 debug_log "Reading plans"
 for plan in  $PLAN_OUT_DIR/plan-*;do
     echo $plan
-    debug_file "$paln"
+    debug_file "$plan"
     cat $plan
 done
 
