@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.7.2...v0.8.0) (2023-11-03)
+
+
+### Features
+
+* updated github comment ([1a75b0e](https://github.com/Fenikks/gh-actions-terragrunt/commit/1a75b0e06b0cb76f9da944e0d1559f13fbe13458))
+
 ## [0.7.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.7.1...v0.7.2) (2023-11-03)
 
 
