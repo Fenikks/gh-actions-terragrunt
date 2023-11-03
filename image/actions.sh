@@ -2,6 +2,16 @@
 
 set -euo pipefail
 
+# Every file written to disk should use one of these directories
+STEP_TMP_DIR="/tmp"
+PLAN_OUT_DIR="/tmp/plan"
+JOB_TMP_DIR="$HOME/.gh-actions-terragrunt"
+WORKSPACE_TMP_DIR=".gh-actions-terragrunt/$(random_string)"
+mkdir -p $PLAN_OUT_DIR
+readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR
+export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR
+
+
 # shellcheck source=../workflow_commands.sh
 source /usr/local/workflow_commands.sh
 
@@ -27,9 +37,9 @@ function setup() {
     fi
 
     if [[ ! -v TERRAFORM_ACTIONS_GITHUB_TOKEN ]]; then
-      if [[ -v GITHUB_TOKEN ]]; then
-        export TERRAFORM_ACTIONS_GITHUB_TOKEN="$GITHUB_TOKEN"
-      fi
+        if [[ -v GITHUB_TOKEN ]]; then
+            export TERRAFORM_ACTIONS_GITHUB_TOKEN="$GITHUB_TOKEN"
+        fi
     fi
     
     if ! github_comment_react +1 2>"$STEP_TMP_DIR/github_comment_react.stderr"; then
@@ -43,11 +53,11 @@ function setup() {
     local TF_VERSION
     
     if [[ -v INPUT_TG_VERSION ]]; then
-      TG_VERSION=$INPUT_TG_VERSION
+        TG_VERSION=$INPUT_TG_VERSION
     fi
 
     if [[ -v INPUT_TF_VERSION ]]; then
-      TF_VERSION=$INPUT_TF_VERSION
+        TF_VERSION=$INPUT_TF_VERSION
     fi
 
     curl -Lo /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64"
@@ -59,8 +69,6 @@ function setup() {
     end_group
 
     detect-tfmask
-
-    # execute_run_commands
 }
 
 function set-common-plan-args() {
@@ -81,27 +89,29 @@ function set-common-plan-args() {
 
 function plan() {
 
-    local PLAN_OUT_ARG
-    if [[ -n "$PLAN_OUT" ]]; then
-        PLAN_OUT_ARG="-out=$PLAN_OUT"
-    else
-        PLAN_OUT_ARG=""
-    fi
-
     # shellcheck disable=SC2086
-    debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG $PLAN_OUT_ARG '$PLAN_ARGS'  # don't expand PLAN_ARGS
+    debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
+
+    MODULE_PATHS=$(find $INPUT_PATH -mindepth 2 -name terragrunt.hcl -exec dirname {} \;)
 
     set +e
     # shellcheck disable=SC2086
-    (cd "$INPUT_PATH" && terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG $PLAN_OUT_ARG $PLAN_ARGS) \
+    (cd "$INPUT_PATH" && terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
         2>"$STEP_TMP_DIR/terraform_plan.stderr" \
-        | $TFMASK \
-        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_plan.stdout" \
-        | compact_plan \
-            >"$STEP_TMP_DIR/plan.txt"
+        | $TFMASK 
+        
+        # \
+        # | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_plan.stdout" \
+        # | compact_plan \
+        #     >"$STEP_TMP_DIR/plan.txt"
 
     # shellcheck disable=SC2034
-    PLAN_EXIT=${PIPESTATUS[0]}
+    #PLAN_EXIT=${PIPESTATUS[0]}
+    for i in $MODULE_PATHS; do 
+        plan_name=plan-${i//\//-}
+        terragrunt show plan.out --terragrunt-working-dir $i -no-color|tee $PLAN_OUT_DIR/$plan_name
+        #compact_plan($(cat $PLAN_OUT_DIR/$plan_name)) > $PLAN_OUT_DIR/$plan_name
+    done
     set -e
 }
 
@@ -250,12 +260,5 @@ function fix_owners() {
         debug_cmd find "$INPUT_PATH" -regex '.*/zzzz-gh-actions-terragrunt-[0-9]+\.auto\.tfvars' -print -delete || true
     fi
 }
-
-# Every file written to disk should use one of these directories
-STEP_TMP_DIR="/tmp"
-JOB_TMP_DIR="$HOME/.gh-actions-terragrunt"
-WORKSPACE_TMP_DIR=".gh-actions-terragrunt/$(random_string)"
-readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR
-export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR
 
 trap fix_owners EXIT

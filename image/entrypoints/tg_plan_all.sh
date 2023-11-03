@@ -11,31 +11,27 @@ set-common-plan-args
 exec 3>&1
 
 ### Generate a plan
-PLAN_OUT="$STEP_TMP_DIR/plan.out"
-#PLAN_ARGS="$PLAN_ARGS -lock=false"
+#PLAN_OUT="$STEP_TMP_DIR/plan.out"
 plan
 
-# if [[ $PLAN_EXIT -eq 1 ]]; then
-#     if grep -q "Saving a generated plan is currently not supported" "$STEP_TMP_DIR/terraform_plan.stderr"; then
-#         # This terraform module is using the remote backend, which is deficient.
-#         set-remote-plan-args
-#         PLAN_OUT=""
-#         PLAN_ARGS="$PLAN_ARGS -lock=false"
-#         plan
-#     fi
-# fi
 
 cat "$STEP_TMP_DIR/terraform_plan.stderr"
+debug_log "Checking if terragrunt plan finished with error"
+debug_file "$STEP_TMP_DIR/terraform_plan.stderr"
 
-# if [[ -z "$PLAN_OUT" ]]; then
-#     if remote-run-id "$STEP_TMP_DIR/terraform_plan.stdout" >"$STEP_TMP_DIR/remote-run-id.stdout" 2>"$STEP_TMP_DIR/remote-run-id.stderr"; then
-#         RUN_ID="$(<"$STEP_TMP_DIR/remote-run-id.stdout")"
-#         set_output run_id "$RUN_ID"
-#     else
-#         debug_log "Failed to get remote run-id"
-#         debug_file "$STEP_TMP_DIR/remote-run-id.stderr"
-#     fi
-# fi
+if [ -e "$STEP_TMP_DIR/terraform_plan.stderr" && -s "$STEP_TMP_DIR/terraform_plan.stderr" ]; then
+    debug_log "terragrunt plan finished with error"
+else
+    debug_log "terragrunt plan complites successfully"
+fi
+
+debug_log "Reading plans"
+for plan in  $PLAN_OUT_DIR/plan-*;do
+    echo $plan
+    debug_file "$paln"
+    cat $plan
+done
+
 
 if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "issue_comment" || "$GITHUB_EVENT_NAME" == "pull_request_review_comment" || "$GITHUB_EVENT_NAME" == "pull_request_target" || "$GITHUB_EVENT_NAME" == "pull_request_review" || "$GITHUB_EVENT_NAME" == "repository_dispatch" ]]; then
     if [[ "$INPUT_ADD_GITHUB_COMMENT" == "true" || "$INPUT_ADD_GITHUB_COMMENT" == "changes-only" ]]; then
@@ -96,14 +92,4 @@ if [[ -n "$PLAN_OUT" ]]; then
     else
         debug_file "$STEP_TMP_DIR/terraform_show.stderr"
     fi
-# elif [[ -n "$RUN_ID" ]]; then
-#     if terraform-cloud-state "$RUN_ID" >"$STEP_TMP_DIR/terraform_cloud_state.stdout" 2>"$STEP_TMP_DIR/terraform_cloud_state.stderr"; then
-#         debug_log "Fetched JSON plan from TFC"
-#         cp "$STEP_TMP_DIR/terraform_cloud_state.stdout" "$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR/plan.json"
-#         set_output json_plan_path "$WORKSPACE_TMP_DIR/plan.json"
-#     else
-#         debug_log "Failed to fetch JSON plan from TFC"
-#         debug_file "$STEP_TMP_DIR/terraform_cloud_state.stdout"
-#         debug_file "$STEP_TMP_DIR/terraform_cloud_state.stderr"
-#     fi
 fi
