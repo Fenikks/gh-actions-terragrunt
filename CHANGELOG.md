@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.7.1...v0.7.2) (2023-11-03)
+
+
+### Bug Fixes
+
+* typo ([c000736](https://github.com/Fenikks/gh-actions-terragrunt/commit/c00073673e167a792c0b52fe8ba192a854200b7f))
+
 ## [0.7.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.7.0...v0.7.1) (2023-11-03)
 
 
