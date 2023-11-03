@@ -98,7 +98,8 @@ function plan() {
     # shellcheck disable=SC2034
     #PLAN_EXIT=${PIPESTATUS[0]}
     for i in $MODULE_PATHS; do 
-        plan_name=plan-${i//\//-}
+        plan_name=${i//./}
+        plan_name=plan-${plan_name//\//-}
         terragrunt show plan.out --terragrunt-working-dir $i -no-color|tee $PLAN_OUT_DIR/$plan_name
         #compact_plan($(cat $PLAN_OUT_DIR/$plan_name)) > $PLAN_OUT_DIR/$plan_name
     done

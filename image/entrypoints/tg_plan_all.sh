@@ -15,14 +15,16 @@ exec 3>&1
 plan
 
 
+echo "### output of $STEP_TMP_DIR/terraform_plan.stderr"
+
 cat "$STEP_TMP_DIR/terraform_plan.stderr"
 debug_log "Checking if terragrunt plan finished with error"
 debug_file "$STEP_TMP_DIR/terraform_plan.stderr"
 
-if [ -e "$STEP_TMP_DIR/terraform_plan.stderr" && -s "$STEP_TMP_DIR/terraform_plan.stderr" ]; then
+if [ -e "$STEP_TMP_DIR/terraform_plan.stderr" ] && [ -s "$STEP_TMP_DIR/terraform_plan.stderr" ]; then
     debug_log "terragrunt plan finished with error"
 else
-    debug_log "terragrunt plan complites successfully"
+    debug_log "terragrunt plan complited successfully"
 fi
 
 debug_log "Reading plans"
