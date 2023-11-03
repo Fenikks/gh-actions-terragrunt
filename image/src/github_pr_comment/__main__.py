@@ -102,34 +102,85 @@ def format_description(action_inputs: PlanPrInputs, sensitive_variables: List[st
 
     return label
 
-def create_summary(plan: Plan, changes: bool=True) -> Optional[List[str]]:
-    summary = []
-    to_move = 0
+def create_sections(folder_path: str) -> Optional[List[dict]]:
+    sections = []
 
-    for line in plan.splitlines():
-        if line.startswith('No changes') or line.startswith('Error'):
-            summary.append(line)
+    for file in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file)
+        
+        module_name = file
 
-        if re.match(r'  # \S+ has moved to \S+$', line):
-            to_move += 1
+        section = {}
+        body = []
+        summary = None
+        to_move = 0
 
-        if line.startswith('Plan:'):
-            summary.append(line)
+        with open(file_path, 'r') as plan:
+            lines = plan.readlines()
 
-            if to_move and 'move' not in summary:
-                summary[-1] = summary[-1].rstrip('.') + f', {to_move} to move.'
+            for line in lines:
+                            
+                if line.startswith('No changes') or line.startswith('Error'):
+                    summary = line
 
-        if line.startswith('Changes to Outputs'):
-            if summary:
-                summary[-1] = summary[-1] + ' Changes to Outputs.'
-            else:
-                summary.append('Changes to Outputs')
+                if re.match(r'  # \S+ has moved to \S+$', line):
+                    to_move += 1
 
-    if summary:
-        return summary
+                if line.startswith('Plan:'):
+                    summary = line
+                    if to_move and 'move' not in summary:
+                        summary = summary.rstrip('.') + f', {to_move} to move.'
+                
+                if line.startswith('Changes to Outputs'):
+                    if summary:
+                        summary = summary + ' Changes to Outputs.'
+                    else:
+                        summary = line
+                
+                body.append(line)
+            
+        summary = f'{module_name}: {summary}'
+        section['summary'] = summary  
+        section['body'] = ''.join(body)
+        sections.append(section)
+            
+        print(section)
 
-    # Terraform 1.4.0 starting forgetting to print the plan summary
-    return 'Plan generated.' if changes else 'No changes.'
+    if sections:
+        print(sections)
+        return sections
+
+    # No sections were found in the folder.
+    return 'Plan generated.'
+
+# def create_summary(plan: Plan, changes: bool=True) -> Optional[List[str]]:
+#     summary = []
+#     to_move = 0
+
+#     for line in plan.splitlines():
+#         if line.startswith('No changes') or line.startswith('Error'):
+#             summary.append(line)
+
+#         if re.match(r'  # \S+ has moved to \S+$', line):
+#             to_move += 1
+
+#         if line.startswith('Plan:'):
+#             summary.append(line)
+
+#             if to_move and 'move' not in summary:
+#                 summary[-1] = summary[-1].rstrip('.') + f', {to_move} to move.'
+
+#         if line.startswith('Changes to Outputs'):
+#             if summary:
+#                 summary[-1] = summary[-1] + ' Changes to Outputs.'
+#             else:
+#                 summary.append('Changes to Outputs')
+
+#     if summary:
+#         return summary
+
+#     # Terraform 1.4.0 starting forgetting to print the plan summary
+#     return 'Plan generated.' if changes else 'No changes.'
 
 
 def current_user(actions_env: GithubEnv) -> str:
@@ -289,6 +340,20 @@ def format_plan_text(plan_text: str) -> Tuple[str, str]:
     else:
         return 'text', plan_text
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         sys.stderr.write(f'''Usage:
@@ -316,31 +381,33 @@ def main() -> int:
     status = cast(Status, os.environ.get('STATUS', ''))
 
     if sys.argv[1] == 'plan':
-        body = cast(Plan, sys.stdin.read().strip())
+        #body = cast(Plan, sys.stdin.read().strip())
+        plan_path = os.environ.get('PLAN_OUT_DIR')
         description = format_description(action_inputs, get_sensitive_variables(module))
 
-        only_if_exists = False
-        if action_inputs['INPUT_ADD_GITHUB_COMMENT'] == 'changes-only' and os.environ.get('TF_CHANGES', 'true') == 'false':
-            only_if_exists = True
+        # only_if_exists = False
+        # if action_inputs['INPUT_ADD_GITHUB_COMMENT'] == 'changes-only' and os.environ.get('TF_CHANGES', 'true') == 'false':
+        #     only_if_exists = True
 
-        if comment.comment_url is None and only_if_exists:
-            debug('Comment doesn\'t already exist - not creating it')
-            return 0
+        # if comment.comment_url is None and only_if_exists:
+        #     debug('Comment doesn\'t already exist - not creating it')
+        #     return 0
 
         headers = comment.headers.copy()
         headers['plan_job_ref'] = job_workflow_ref()
         headers['plan_hash'] = plan_hash(body, comment.issue_url)
         headers['plan_text_format'], plan_text = format_plan_text(body)
 
-        changes = os.environ.get('TF_CHANGES') == 'true'
+        # changes = os.environ.get('TF_CHANGES') == 'true'
 
         comment = update_comment(
             github,
             comment,
             description=description,
-            summary=create_summary(body, changes),
+            sections=create_sections(plan_path),
+            # summary=create_summary(body, changes),
             headers=headers,
-            body=plan_text,
+            # body=plan_text,
             status=status
         )
 
