@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.10.0...v0.11.0) (2023-11-06)
+
+
+### Features
+
+* added hash plan header ([5450dbc](https://github.com/Fenikks/gh-actions-terragrunt/commit/5450dbc11c973da755d93bc7e0aaa99712b36e9d))
+
 ## [0.10.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.9.1...v0.10.0) (2023-11-06)
 
 
