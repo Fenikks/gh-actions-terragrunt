@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.9.0...v0.9.1) (2023-11-06)
+
+
+### Bug Fixes
+
+* error in the comment.py ([5d4a5eb](https://github.com/Fenikks/gh-actions-terragrunt/commit/5d4a5ebfd3b98bbd155eff875463138806586d1c))
+
 ## [0.9.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.8.0...v0.9.0) (2023-11-03)
 
 
