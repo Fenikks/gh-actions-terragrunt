@@ -380,8 +380,6 @@ def main() -> int:
         print("printing headers")
         print(headers)
                
-        # changes = os.environ.get('TF_CHANGES') == 'true'
-
         comment = update_comment(
             github,
             comment,
