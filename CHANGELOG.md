@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.9.1...v0.10.0) (2023-11-06)
+
+
+### Features
+
+* removed unused code ([5f9168a](https://github.com/Fenikks/gh-actions-terragrunt/commit/5f9168a3b39bc76102472d29dcf13b1b4ff7c8b5))
+
 ## [0.9.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.9.0...v0.9.1) (2023-11-06)
 
 
