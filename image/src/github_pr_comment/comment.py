@@ -154,7 +154,6 @@ def _parse_comment_header(comment_header: Optional[str]) -> dict[str, str]:
 
     return {}
 
-
 def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
 
     sections = []
@@ -193,47 +192,6 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
         status=match.group('status').strip()
     )
 
-
-
-
-
-
-
-
-# def _to_api_payload(comment: TerraformComment) -> str:
-#     details_open = False
-#     hcl_highlighting = False
-
-#     if comment.body.startswith('Error'):
-#         details_open = True
-#     elif 'Plan:' in comment.body:
-#         hcl_highlighting = True
-#         num_lines = len(comment.body.splitlines())
-#         if num_lines < collapse_threshold:
-#             details_open = True
-
-#     if comment.summary is None:
-#         details_open = True
-
-#     header = _format_comment_header(**comment.headers)
-
-#     body = f'''{header}
-# {comment.description}
-# <details{' open' if details_open else ''}>
-# {f'<summary>{comment.summary}</summary>' if comment.summary is not None else ''}
-
-# ```{'hcl' if hcl_highlighting else ''}
-# {comment.body}
-# ```
-# </details>
-# '''
-
-#     if comment.status:
-#         body += '\n' + comment.status
-
-#     return body
-
-
 def _to_api_payload(comment: TerraformComment) -> str:
     details_open = False
     hcl_highlighting = False
@@ -270,7 +228,6 @@ def _to_api_payload(comment: TerraformComment) -> str:
         body += '\n' + comment.status
 
     return body
-
 
 def matching_headers(comment: TerraformComment, headers: dict[str, str]) -> bool:
     """

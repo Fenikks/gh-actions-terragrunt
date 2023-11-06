@@ -102,6 +102,22 @@ def format_description(action_inputs: PlanPrInputs) -> str:
 
     return label
 
+def create_plan_hashes(folder_path: str, salt: str) -> Optional[List[dict]]:
+    plan_hashes = []
+
+    for file in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file)
+
+        hash_section = {}
+
+        with open(file_path, 'r') as plan:
+            hash_section['plan_name'] = file
+            hash_section['plan_hash'] = plan_hash(plan.read(), salt)
+            plan_hashes.append(hash_section)
+    print("PRINTING HASHES")
+    print(plan_hashes)
+    return plan_hashes
+
 def create_sections(folder_path: str) -> Optional[List[dict]]:
     sections = []
 
@@ -357,6 +373,7 @@ def main() -> int:
 
         headers = comment.headers.copy()
         headers['plan_job_ref'] = job_workflow_ref()
+        headers['plan_hashes'] = create_plan_hashes(plan_path, comment.issue_url)
         #headers['plan_hash'] = plan_hash(body, comment.issue_url)
         #headers['plan_text_format'], plan_text = format_plan_text(body)
 
