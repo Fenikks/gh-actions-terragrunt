@@ -2,12 +2,15 @@
 
 This Terragrunt action based on [dflook/terraform-github-actions](https://github.com/dflook/terraform-github-actions).
 
-This actions generates a Terraform plan for all modules in the provided path.
-If the triggering event relates to a PR it will add a comment on the PR containing the generated plan.
+This actions generates a Terraform plan for each module in the provided path.
+If the triggering event relates to a PR it will add a comment on the PR containing the generated plans.
 
 
 The `GITHUB_TOKEN` environment variable must be set for the PR comment to be added.
 The action can be run on other events, which prints the plan to the workflow log.
+
+**NOTE:** This github action uses default terragrunt cache folder `.terragrunt-cache` to create plan and then to read it. 
+Don't use terragrunt_download setting in your terragrunt code and also don't clear cache. Otherwise the action won't work.
 
 ## Inputs
 
@@ -112,68 +115,6 @@ The action can be run on other events, which prints the plan to the workflow log
 
   - Type: string
   - Optional
-
-* `TF_PLAN_COLLAPSE_LENGTH`
-
-  When PR comments are enabled, the terraform output is included in a collapsable pane.
-  
-  If a terraform plan has fewer lines than this value, the pane is expanded
-  by default when the comment is displayed.
-
-  ```yaml
-  env:
-    TF_PLAN_COLLAPSE_LENGTH: 30
-  ```
-
-  - Type: integer
-  - Optional
-  - Default: 10
-
-## Outputs
-
-* `changes`
-
-  Set to 'true' if the plan would apply any changes, 'false' if it wouldn't.
-
-  - Type: boolean
-
-* `json_plan_path`
-
-  This is the path to the generated plan in [JSON Output Format](https://www.terraform.io/docs/internals/json-format.html)
-  The path is relative to the Actions workspace.
-
-  - Type: string
-
-* `text_plan_path`
-
-  This is the path to the generated plan in a human-readable format.
-  The path is relative to the Actions workspace.
-
-  - Type: string
-
-* `to_add`
-
-  The number of resources that would be added by this plan.
-
-  - Type: number
-
-* `to_change`
-
-  The number of resources that would be changed by this plan.
-
-  - Type: number
-
-* `to_destroy`
-
-  The number of resources that would be destroyed by this plan.
-
-  - Type: number
-
-* `run_id`
-
-  If the root module uses the `remote` or `cloud` backend in remote execution mode, this output will be set to the remote run id.
-
-  - Type: string
 
 ## Workflow events
 

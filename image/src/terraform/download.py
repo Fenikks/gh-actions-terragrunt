@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 class DownloadError(Exception):
     """Error downloading terraform"""
 
+
 def get_platform() -> str:
     """Return terraform's idea of the current platform name."""
 
@@ -165,6 +166,7 @@ def verify_archive(version: Version, cache_dir: Path, archive_name: str, checksu
         )
     except subprocess.CalledProcessError:
         raise DownloadError(f'Could not verify integrity of terraform executable for {version}')
+
 
 def get_archive(version: Version, cache_dirs: list[Path]) -> Tuple[Path, str]:
     """

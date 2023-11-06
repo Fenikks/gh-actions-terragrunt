@@ -7,6 +7,7 @@ def compact_plan(input):
     plan = False
     buffer = []
 
+
     for line in input:
 
         if not plan and (

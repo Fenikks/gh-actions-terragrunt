@@ -112,26 +112,12 @@ function detect-tfmask() {
     export TFMASK
 }
 
-
-
-
-
-
-
-
-
-
-
-
 function test-terraform-version() {
     local OP="$1"
     local VER="$2"
 
     python3 -c "exit(0 if ($TERRAFORM_VER_MAJOR, $TERRAFORM_VER_MINOR, $TERRAFORM_VER_PATCH) $OP tuple(int(v) for v in '$VER'.split('.')) else 1)"
 }
-
-
-
 
 function execute_run_commands() {
     if [[ -v TERRAFORM_PRE_RUN ]]; then
@@ -146,8 +132,6 @@ function execute_run_commands() {
         end_group
     fi
 }
-
-
 
 function relative_to() {
     local absbase
@@ -214,8 +198,6 @@ function write_credentials() {
 
     debug_cmd git config --list
 }
-
-
 
 function force_unlock() {
     echo "Unlocking state with ID: $INPUT_LOCK_ID"

@@ -33,8 +33,6 @@ RUN apt-get update  \
     dirmngr \
  && rm -rf /var/lib/apt/lists/*
 
-# RUN mkdir -p $TF_PLUGIN_CACHE_DIR
-
 COPY --from=tfmask /go/tfmask/release/tfmask /usr/local/bin/tfmask
 ENV TFMASK_RESOURCES_REGEX="(?i)^(random_id|kubernetes_secret|acme_certificate).*$"
 

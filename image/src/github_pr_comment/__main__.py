@@ -39,8 +39,10 @@ ToolProductName = os.environ.get('TOOL_PRODUCT_NAME', 'Terragrunt')
 def job_markdown_ref() -> str:
     return f'[{os.environ["GITHUB_WORKFLOW"]} #{os.environ["GITHUB_RUN_NUMBER"]}]({os.environ["GITHUB_SERVER_URL"]}/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]})'
 
+
 def job_workflow_ref() -> str:
     return f'Job {os.environ["GITHUB_WORKFLOW"]} #{os.environ["GITHUB_RUN_NUMBER"]} at {os.environ["GITHUB_SERVER_URL"]}/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]}'
+
 
 def _mask_backend_config(action_inputs: PlanPrInputs) -> Optional[str]:
     bad_words = [
@@ -72,6 +74,7 @@ def _mask_backend_config(action_inputs: PlanPrInputs) -> Optional[str]:
 
     return ','.join(clean)
 
+
 def format_classic_description(action_inputs: PlanPrInputs) -> str:
     if action_inputs['INPUT_LABEL']:
         return f'Terraform plan for __{action_inputs["INPUT_LABEL"]}__'
@@ -83,7 +86,7 @@ def format_classic_description(action_inputs: PlanPrInputs) -> str:
 
     return label
 
-# def format_description(action_inputs: PlanPrInputs, sensitive_variables: List[str]) -> str:
+
 def format_description(action_inputs: PlanPrInputs) -> str:    
 
     mode = ''
@@ -97,10 +100,8 @@ def format_description(action_inputs: PlanPrInputs) -> str:
 
     label += mode
 
-    # if backend_config := _mask_backend_config(action_inputs):
-    #     label += f'\nWith backend config: `{backend_config}`'
-
     return label
+
 
 def create_plan_hashes(folder_path: str, salt: str) -> Optional[List[dict]]:
     plan_hashes = []
@@ -117,6 +118,7 @@ def create_plan_hashes(folder_path: str, salt: str) -> Optional[List[dict]]:
     print("PRINTING HASHES")
     print(plan_hashes)
     return plan_hashes
+
 
 def create_sections(folder_path: str) -> Optional[List[dict]]:
     sections = []
@@ -160,16 +162,12 @@ def create_sections(folder_path: str) -> Optional[List[dict]]:
         section['body'] = ''.join(body)
         sections.append(section)
 
-        print("PRINTING SECTION") 
-        print(section)
-
     if sections:
-        print("PRINTING SECTIONS")
-        print(sections)
         return sections
 
     # No sections were found in the folder.
     return 'Plan generated.'
+
 
 def current_user(actions_env: GithubEnv) -> str:
     token_hash = hashlib.sha256(f'dflook/terraform-github-actions/{github_token}'.encode()).hexdigest()
@@ -249,7 +247,7 @@ def get_pr() -> PrUrl:
 
     return cast(PrUrl, pr_url)
 
-# def get_comment(action_inputs: PlanPrInputs, backend_fingerprint: bytes, backup_fingerprint: bytes) -> TerraformComment:
+
 def get_comment(action_inputs: PlanPrInputs) -> TerraformComment:
     if 'comment' in step_cache:
         return deserialize(step_cache['comment'])
@@ -262,20 +260,9 @@ def get_comment(action_inputs: PlanPrInputs) -> TerraformComment:
 
     headers = {}
 
-    # if backend_type := os.environ.get('TERRAFORM_BACKEND_TYPE'):
-    #     if backend_type == 'cloud':
-    #         backend_type = 'remote'
-    #     headers['backend_type'] = backend_type
-
     headers['label'] = os.environ.get('INPUT_LABEL') or None
 
     plan_modifier = {}
-    # if target := os.environ.get('INPUT_TARGET'):
-    #     plan_modifier['target'] = sorted(t.strip() for t in target.replace(',', '\n', ).split('\n') if t.strip())
-
-    # if replace := os.environ.get('INPUT_REPLACE'):
-    #     plan_modifier['replace'] = sorted(t.strip() for t in replace.replace(',', '\n', ).split('\n') if t.strip())
-
     if os.environ.get('INPUT_DESTROY') == 'true':
         plan_modifier['destroy'] = 'true'
 
@@ -285,10 +272,8 @@ def get_comment(action_inputs: PlanPrInputs) -> TerraformComment:
 
     backup_headers = headers.copy()
 
-    # headers['backend'] = comment_hash(backend_fingerprint, pr_url)
-    # backup_headers['backend'] = comment_hash(backup_fingerprint, pr_url)
-
     return find_comment(github, issue_url, username, headers, backup_headers, legacy_description)
+
 
 def is_approved(proposed_plan: str, comment: TerraformComment) -> bool:
 
@@ -298,6 +283,7 @@ def is_approved(proposed_plan: str, comment: TerraformComment) -> bool:
     else:
         debug('Approving plan based on plan text')
         return plan_cmp(proposed_plan, comment.body)
+
 
 def format_plan_text(plan_text: str) -> Tuple[str, str]:
     """
@@ -328,8 +314,6 @@ def format_plan_text(plan_text: str) -> Tuple[str, str]:
         return 'text', plan_text
 
 
-
-
 def main() -> int:
     if len(sys.argv) < 2:
         sys.stderr.write(f'''Usage:
@@ -344,50 +328,24 @@ def main() -> int:
 
     action_inputs = cast(PlanPrInputs, os.environ)
 
-    # module = load_module(Path(action_inputs.get('INPUT_PATH', '.')))
-
-    # backend_type, backend_config = partial_config(action_inputs, module)
-    # partial_backend_fingerprint = fingerprint(backend_type, backend_config, os.environ)
-
-    # backend_type, backend_config = complete_config(action_inputs, module)
-    # backend_fingerprint = fingerprint(backend_type, backend_config, os.environ)
-
-    # comment = get_comment(action_inputs, backend_fingerprint, partial_backend_fingerprint)
     comment = get_comment(action_inputs)
 
     status = cast(Status, os.environ.get('STATUS', ''))
 
     if sys.argv[1] == 'plan':
-        #body = cast(Plan, sys.stdin.read().strip())
         plan_path = os.environ.get('PLAN_OUT_DIR')
-        # description = format_description(action_inputs, get_sensitive_variables(module))
         description = format_description(action_inputs)
-
-        # only_if_exists = False
-        # if action_inputs['INPUT_ADD_GITHUB_COMMENT'] == 'changes-only' and os.environ.get('TF_CHANGES', 'true') == 'false':
-        #     only_if_exists = True
-
-        # if comment.comment_url is None and only_if_exists:
-        #     debug('Comment doesn\'t already exist - not creating it')
-        #     return 0
 
         headers = comment.headers.copy()
         headers['plan_job_ref'] = job_workflow_ref()
         headers['plan_hashes'] = create_plan_hashes(plan_path, comment.issue_url)
-        #headers['plan_hash'] = plan_hash(body, comment.issue_url)
-        #headers['plan_text_format'], plan_text = format_plan_text(body)
 
-        print("printing headers")
-        print(headers)
-               
         comment = update_comment(
             github,
             comment,
             description=description,
             sections=create_sections(plan_path),
-            # summary=create_summary(body, changes),
             headers=headers,
-            # body=plan_text,
             status=status
         )
 

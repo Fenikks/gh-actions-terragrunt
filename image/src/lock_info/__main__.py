@@ -17,6 +17,7 @@ import sys
 from typing import Iterable, Optional
 from github_actions.commands import output
 
+
 def get_lock_info(stderr: Iterable[str]) -> Optional[dict[str, str]]:
     locked = False
     lock_info_line = False

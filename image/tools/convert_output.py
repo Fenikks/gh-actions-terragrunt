@@ -15,6 +15,7 @@ class Output:
     name: str
     value: str
 
+
 def convert_to_github(outputs: Dict) -> Iterable[Union[Mask, Output]]:
     for name, output in outputs.items():
 

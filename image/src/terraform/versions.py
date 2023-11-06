@@ -21,6 +21,7 @@ class Version:
     Versions are made up of major, minor & patch numbers, plus an optional pre_release string.
     """
 
+
     def __init__(self, version: str, product: str = 'Terraform'):
         self.product = product
 
@@ -33,6 +34,7 @@ class Version:
         self.patch = int(match.group(3))
         self.pre_release = match.group(4) or ''
 
+
     def __repr__(self) -> str:
         s = f'{self.major}.{self.minor}.{self.patch}'
 
@@ -41,14 +43,17 @@ class Version:
 
         return s
 
+
     def __hash__(self) -> int:
         return hash(self.__repr__())
+
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Version):
             return NotImplemented
 
         return self.major == other.major and self.minor == other.minor and self.patch == other.patch and self.pre_release == other.pre_release
+
 
     def __lt__(self, other: Any) -> bool:
         if not isinstance(other, Version):
@@ -73,6 +78,7 @@ class Version:
 class Constraint:
     """A Terraform version constraint."""
 
+
     def __init__(self, constraint: str):
         if match := re.match(r'([=!<>~]*)(.*)', constraint.replace(' ', '')):
             self.operator = cast(ConstraintOperator, match.group(1) or '=')
@@ -88,6 +94,7 @@ class Constraint:
         else:
             raise ValueError(f'Invalid version constraint {constraint}')
 
+
     def __repr__(self) -> str:
         s = f'{self.operator}{self.major}'
 
@@ -102,14 +109,17 @@ class Constraint:
 
         return s
 
+
     def __hash__(self) -> int:
         return hash(self.__repr__())
+
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Constraint):
             return NotImplemented
 
         return self.major == other.major and self.minor == other.minor and self.patch == other.patch and self.pre_release == other.pre_release and self.operator == other.operator
+
 
     def __lt__(self, other: Any) -> bool:
         if not isinstance(other, Constraint):
@@ -130,6 +140,7 @@ class Constraint:
 
         operator_order = ['<', '<=', '=', '~>', '>=', '>']
         return operator_order.index(self.operator) < operator_order.index(other.operator)
+
 
     def is_allowed(self, version: Version) -> bool:
         """Is the given version allowed by this constraint."""
@@ -184,6 +195,7 @@ class Constraint:
             # ~> x.x.x
             return version.major == self.major and version.minor == self.minor and version.patch >= self.patch
 
+
 def latest_non_prerelease_version(versions: Iterable[Version]) -> Optional[Version]:
     """Return the latest non prerelease version of the given versions."""
 
@@ -191,10 +203,12 @@ def latest_non_prerelease_version(versions: Iterable[Version]) -> Optional[Versi
         if not v.pre_release:
             return v
 
+
 def latest_version(versions: Iterable[Version]) -> Version:
     """Return the latest version of the given versions."""
 
     return sorted(versions, reverse=True)[0]
+
 
 def earliest_non_prerelease_version(versions: Iterable[Version]) -> Optional[Version]:
     """Return the earliest non prerelease version of the given versions."""
@@ -202,6 +216,7 @@ def earliest_non_prerelease_version(versions: Iterable[Version]) -> Optional[Ver
     for v in sorted(versions):
         if not v.pre_release:
             return v
+
 
 def earliest_version(versions: Iterable[Version]) -> Version:
     """Return the earliest version of the given versions."""

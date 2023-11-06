@@ -53,6 +53,7 @@ class TerraformComment:
         # self._body = body.strip()
         self._status = status.strip()
 
+
     def __eq__(self, other):
         if not isinstance(other, TerraformComment):
             return NotImplemented
@@ -68,16 +69,20 @@ class TerraformComment:
             self._status == other._status
         )
 
+
     def __ne__(self, other):
         return not self.__eq__(other)
+
 
     def __repr__(self):
         #return f'TerraformComment(issue_url={self._issue_url!r}, comment_url={self._comment_url!r}, headers={self._headers!r}, description={self._description!r}, summary={self._summary!r}, body={self._body!r}, status={self._status!r})'
         return f'TerraformComment(issue_url={self._issue_url!r}, comment_url={self._comment_url!r}, headers={self._headers!r}, description={self._description!r}, sections={self._sections!r}, status={self._status!r})'
 
+
     @property
     def comment_url(self) -> Optional[CommentUrl]:
         return self._comment_url
+
 
     @comment_url.setter
     def comment_url(self, comment_url: CommentUrl) -> None:
@@ -85,33 +90,31 @@ class TerraformComment:
             raise Exception('Can only set url for comments that don\'t exist yet')
         self._comment_url = comment_url
 
+
     @property
     def issue_url(self) -> IssueUrl:
         return self._issue_url
+
 
     @property
     def headers(self) -> dict[str, str]:
         return self._headers
 
+
     @property
     def description(self) -> str:
         return self._description
-    
+
+
     @property
     def sections(self) -> str:
         return self._sections
 
-    # @property
-    # def summary(self) -> str:
-    #     return self._summary
-
-    # @property
-    # def body(self) -> str:
-    #     return self._body
 
     @property
     def status(self) -> str:
         return self._status
+
 
 def serialize(comment: TerraformComment) -> str:
     return json.dumps({
@@ -124,6 +127,7 @@ def serialize(comment: TerraformComment) -> str:
         # 'body': comment.body,
         'status': comment.status
     })
+
 
 def deserialize(s) -> TerraformComment:
     j = json.loads(s)
@@ -139,8 +143,10 @@ def deserialize(s) -> TerraformComment:
         status=j['status']
     )
 
+
 def _format_comment_header(**kwargs) -> str:
     return f'<!-- dflook/terraform-github-actions {json.dumps(kwargs, separators=(",",":"))} -->'
+
 
 def _parse_comment_header(comment_header: Optional[str]) -> dict[str, str]:
     if comment_header is None:
@@ -153,6 +159,7 @@ def _parse_comment_header(comment_header: Optional[str]) -> dict[str, str]:
             return {}
 
     return {}
+
 
 def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
 
@@ -192,6 +199,7 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
         status=match.group('status').strip()
     )
 
+
 def _to_api_payload(comment: TerraformComment) -> str:
     details_open = False
     hcl_highlighting = False
@@ -229,6 +237,7 @@ def _to_api_payload(comment: TerraformComment) -> str:
 
     return body
 
+
 def matching_headers(comment: TerraformComment, headers: dict[str, str]) -> bool:
     """
     Does a comment have all the specified headers
@@ -245,6 +254,7 @@ def matching_headers(comment: TerraformComment, headers: dict[str, str]) -> bool
             return False
 
     return True
+
 
 def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers: dict[str, str], backup_headers: dict[str, str], legacy_description: str) -> TerraformComment:
     """

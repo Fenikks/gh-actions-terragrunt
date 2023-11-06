@@ -17,6 +17,7 @@ def workspace_exists(stdin, workspace: str) -> bool:
     debug('workspace doesn\'t exist')
     return False
 
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('No workspace specified')

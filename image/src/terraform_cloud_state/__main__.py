@@ -21,6 +21,7 @@ def get_cloud_json_plan(backend_config: BackendConfig, run_id: str) -> bytes:
     response.raise_for_status()
     return response.content
 
+
 def remote_run_id():
     if len(sys.argv) < 2:
         sys.stderr.write('Usage: remote-run-id <terraform_plan.txt>\n')
@@ -34,6 +35,7 @@ def remote_run_id():
         sys.exit(1)
 
     sys.stdout.write(run_id)
+
 
 def main():
     if len(sys.argv) < 2:
