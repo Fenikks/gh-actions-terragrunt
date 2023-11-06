@@ -168,7 +168,7 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
         </details>
     ''', comment['body'], re.VERBOSE | re.DOTALL):
         section = {
-            'summary': section_match.group('summary').strip() if 'summary' in match.groupdict() else None,
+            'summary': section_match.group('summary').strip() if 'summary' in section_match.groupdict() else None,
             'body': section_match.group('body').strip()
         }
         sections.append(section)
