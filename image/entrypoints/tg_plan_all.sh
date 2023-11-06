@@ -35,30 +35,3 @@ if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "issue_c
 else
     debug_log "Not a pull_request, issue_comment, pull_request_target, pull_request_review, pull_request_review_comment or repository_dispatch event - not creating a PR comment"
 fi
-
-# if [[ $PLAN_EXIT -eq 1 ]]; then
-#     debug_log "Error running terragrunt"
-#     exit 1
-
-# elif [[ $PLAN_EXIT -eq 0 ]]; then
-#     debug_log "No Changes to apply"
-#     set_output changes false
-
-# elif [[ $PLAN_EXIT -eq 2 ]]; then
-#     debug_log "Changes to apply"
-#     set_output changes true
-
-#     plan_summary "$STEP_TMP_DIR/plan.txt"
-# fi
-
-# mkdir -p "$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR"
-# cp "$STEP_TMP_DIR/plan.txt" "$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR/plan.txt"
-# set_output text_plan_path "$WORKSPACE_TMP_DIR/plan.txt"
-
-# if [[ -n "$PLAN_OUT" ]]; then
-#     if (cd "$INPUT_PATH" && terragrunt show -json "$PLAN_OUT") >"$GITHUB_WORKSPACE/$WORKSPACE_TMP_DIR/plan.json" 2>"$STEP_TMP_DIR/terraform_show.stderr"; then
-#         set_output json_plan_path "$WORKSPACE_TMP_DIR/plan.json"
-#     else
-#         debug_file "$STEP_TMP_DIR/terraform_show.stderr"
-#     fi
-# fi

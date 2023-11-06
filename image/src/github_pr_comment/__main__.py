@@ -72,7 +72,6 @@ def _mask_backend_config(action_inputs: PlanPrInputs) -> Optional[str]:
 
     return ','.join(clean)
 
-
 def format_classic_description(action_inputs: PlanPrInputs) -> str:
     if action_inputs['INPUT_LABEL']:
         return f'Terraform plan for __{action_inputs["INPUT_LABEL"]}__'
@@ -84,7 +83,8 @@ def format_classic_description(action_inputs: PlanPrInputs) -> str:
 
     return label
 
-def format_description(action_inputs: PlanPrInputs, sensitive_variables: List[str]) -> str:
+# def format_description(action_inputs: PlanPrInputs, sensitive_variables: List[str]) -> str:
+def format_description(action_inputs: PlanPrInputs) -> str:    
 
     mode = ''
     if action_inputs["INPUT_DESTROY"] == 'true':
@@ -97,8 +97,8 @@ def format_description(action_inputs: PlanPrInputs, sensitive_variables: List[st
 
     label += mode
 
-    if backend_config := _mask_backend_config(action_inputs):
-        label += f'\nWith backend config: `{backend_config}`'
+    # if backend_config := _mask_backend_config(action_inputs):
+    #     label += f'\nWith backend config: `{backend_config}`'
 
     return label
 
@@ -108,7 +108,7 @@ def create_sections(folder_path: str) -> Optional[List[dict]]:
     for file in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file)
         
-        module_name = file
+        module_name = file.replace("___","/")
 
         section = {}
         body = []
@@ -143,45 +143,17 @@ def create_sections(folder_path: str) -> Optional[List[dict]]:
         section['summary'] = summary  
         section['body'] = ''.join(body)
         sections.append(section)
-            
+
+        print("PRINTING SECTION") 
         print(section)
 
     if sections:
+        print("PRINTING SECTIONS")
         print(sections)
         return sections
 
     # No sections were found in the folder.
     return 'Plan generated.'
-
-# def create_summary(plan: Plan, changes: bool=True) -> Optional[List[str]]:
-#     summary = []
-#     to_move = 0
-
-#     for line in plan.splitlines():
-#         if line.startswith('No changes') or line.startswith('Error'):
-#             summary.append(line)
-
-#         if re.match(r'  # \S+ has moved to \S+$', line):
-#             to_move += 1
-
-#         if line.startswith('Plan:'):
-#             summary.append(line)
-
-#             if to_move and 'move' not in summary:
-#                 summary[-1] = summary[-1].rstrip('.') + f', {to_move} to move.'
-
-#         if line.startswith('Changes to Outputs'):
-#             if summary:
-#                 summary[-1] = summary[-1] + ' Changes to Outputs.'
-#             else:
-#                 summary.append('Changes to Outputs')
-
-#     if summary:
-#         return summary
-
-#     # Terraform 1.4.0 starting forgetting to print the plan summary
-#     return 'Plan generated.' if changes else 'No changes.'
-
 
 def current_user(actions_env: GithubEnv) -> str:
     token_hash = hashlib.sha256(f'dflook/terraform-github-actions/{github_token}'.encode()).hexdigest()
@@ -261,7 +233,8 @@ def get_pr() -> PrUrl:
 
     return cast(PrUrl, pr_url)
 
-def get_comment(action_inputs: PlanPrInputs, backend_fingerprint: bytes, backup_fingerprint: bytes) -> TerraformComment:
+# def get_comment(action_inputs: PlanPrInputs, backend_fingerprint: bytes, backup_fingerprint: bytes) -> TerraformComment:
+def get_comment(action_inputs: PlanPrInputs) -> TerraformComment:
     if 'comment' in step_cache:
         return deserialize(step_cache['comment'])
 
@@ -271,23 +244,21 @@ def get_comment(action_inputs: PlanPrInputs, backend_fingerprint: bytes, backup_
 
     legacy_description = format_classic_description(action_inputs)
 
-    headers = {
-        'workspace': os.environ.get('INPUT_WORKSPACE', 'default'),
-    }
+    headers = {}
 
-    if backend_type := os.environ.get('TERRAFORM_BACKEND_TYPE'):
-        if backend_type == 'cloud':
-            backend_type = 'remote'
-        headers['backend_type'] = backend_type
+    # if backend_type := os.environ.get('TERRAFORM_BACKEND_TYPE'):
+    #     if backend_type == 'cloud':
+    #         backend_type = 'remote'
+    #     headers['backend_type'] = backend_type
 
     headers['label'] = os.environ.get('INPUT_LABEL') or None
 
     plan_modifier = {}
-    if target := os.environ.get('INPUT_TARGET'):
-        plan_modifier['target'] = sorted(t.strip() for t in target.replace(',', '\n', ).split('\n') if t.strip())
+    # if target := os.environ.get('INPUT_TARGET'):
+    #     plan_modifier['target'] = sorted(t.strip() for t in target.replace(',', '\n', ).split('\n') if t.strip())
 
-    if replace := os.environ.get('INPUT_REPLACE'):
-        plan_modifier['replace'] = sorted(t.strip() for t in replace.replace(',', '\n', ).split('\n') if t.strip())
+    # if replace := os.environ.get('INPUT_REPLACE'):
+    #     plan_modifier['replace'] = sorted(t.strip() for t in replace.replace(',', '\n', ).split('\n') if t.strip())
 
     if os.environ.get('INPUT_DESTROY') == 'true':
         plan_modifier['destroy'] = 'true'
@@ -298,8 +269,8 @@ def get_comment(action_inputs: PlanPrInputs, backend_fingerprint: bytes, backup_
 
     backup_headers = headers.copy()
 
-    headers['backend'] = comment_hash(backend_fingerprint, pr_url)
-    backup_headers['backend'] = comment_hash(backup_fingerprint, pr_url)
+    # headers['backend'] = comment_hash(backend_fingerprint, pr_url)
+    # backup_headers['backend'] = comment_hash(backup_fingerprint, pr_url)
 
     return find_comment(github, issue_url, username, headers, backup_headers, legacy_description)
 
@@ -343,21 +314,10 @@ def format_plan_text(plan_text: str) -> Tuple[str, str]:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 def main() -> int:
     if len(sys.argv) < 2:
         sys.stderr.write(f'''Usage:
-    STATUS="<status>" {sys.argv[0]} plan <plan.txt
+    STATUS="<status>" {sys.argv[0]} plan
     STATUS="<status>" {sys.argv[0]} status
     {sys.argv[0]} get plan.txt
     {sys.argv[0]} approved plan.txt
@@ -368,22 +328,24 @@ def main() -> int:
 
     action_inputs = cast(PlanPrInputs, os.environ)
 
-    module = load_module(Path(action_inputs.get('INPUT_PATH', '.')))
+    # module = load_module(Path(action_inputs.get('INPUT_PATH', '.')))
 
-    backend_type, backend_config = partial_config(action_inputs, module)
-    partial_backend_fingerprint = fingerprint(backend_type, backend_config, os.environ)
+    # backend_type, backend_config = partial_config(action_inputs, module)
+    # partial_backend_fingerprint = fingerprint(backend_type, backend_config, os.environ)
 
-    backend_type, backend_config = complete_config(action_inputs, module)
-    backend_fingerprint = fingerprint(backend_type, backend_config, os.environ)
+    # backend_type, backend_config = complete_config(action_inputs, module)
+    # backend_fingerprint = fingerprint(backend_type, backend_config, os.environ)
 
-    comment = get_comment(action_inputs, backend_fingerprint, partial_backend_fingerprint)
+    # comment = get_comment(action_inputs, backend_fingerprint, partial_backend_fingerprint)
+    comment = get_comment(action_inputs)
 
     status = cast(Status, os.environ.get('STATUS', ''))
 
     if sys.argv[1] == 'plan':
         #body = cast(Plan, sys.stdin.read().strip())
         plan_path = os.environ.get('PLAN_OUT_DIR')
-        description = format_description(action_inputs, get_sensitive_variables(module))
+        # description = format_description(action_inputs, get_sensitive_variables(module))
+        description = format_description(action_inputs)
 
         # only_if_exists = False
         # if action_inputs['INPUT_ADD_GITHUB_COMMENT'] == 'changes-only' and os.environ.get('TF_CHANGES', 'true') == 'false':
@@ -395,9 +357,12 @@ def main() -> int:
 
         headers = comment.headers.copy()
         headers['plan_job_ref'] = job_workflow_ref()
-#        headers['plan_hash'] = plan_hash(body, comment.issue_url)
-#        headers['plan_text_format'], plan_text = format_plan_text(body)
+        #headers['plan_hash'] = plan_hash(body, comment.issue_url)
+        #headers['plan_text_format'], plan_text = format_plan_text(body)
 
+        print("printing headers")
+        print(headers)
+               
         # changes = os.environ.get('TF_CHANGES') == 'true'
 
         comment = update_comment(
