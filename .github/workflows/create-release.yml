@@ -1,13 +1,12 @@
 ---
 
 # https://github.com/google-github-actions/release-please-action#release-types-supported
+name: 📦 Create release
 
 on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - dev
-
-name: 📦 Create release
 
 permissions:
   contents: write
