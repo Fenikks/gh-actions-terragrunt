@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.0.0...v1.1.0) (2023-11-08)
+
+
+### Features
+
+* first version of terragrunt-plan-all ([467b5f9](https://github.com/Fenikks/gh-actions-terragrunt/commit/467b5f9a47a80b64ec8382d852c1a77575fffbd7))
+
 ## [1.0.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v0.11.1...v1.0.0) (2023-11-08)
 
 
