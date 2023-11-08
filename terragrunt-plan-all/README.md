@@ -151,7 +151,7 @@ jobs:
           ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - name: terragrung plan
-        uses: Fenikks/terragrunt-plan-all@v.0.0.2
+        uses: Fenikks/terragrunt-plan-all@v1
         with:
           path: my-terraform-config
 ```

@@ -42,15 +42,12 @@ class TerraformComment:
 
     """
 
-    # def __init__(self, *, issue_url: IssueUrl, comment_url: Optional[CommentUrl], headers: dict[str, str], description: str, summary: List[str], body: str, status: str):
     def __init__(self, *, issue_url: IssueUrl, comment_url: Optional[CommentUrl], headers: dict[str, str], description: str, sections: List[dict], status: str):
         self._issue_url = issue_url
         self._comment_url = comment_url
         self._headers = headers
         self._description = description.strip()
         self._sections = sections
-        # self._summary = summary
-        # self._body = body.strip()
         self._status = status.strip()
 
 
@@ -64,8 +61,6 @@ class TerraformComment:
             self._headers == other._headers and
             self._description == other._description and
             self._sections == other._sections and
-            # self._summary == other._summary and
-            # self._body == other._body and
             self._status == other._status
         )
 
@@ -75,7 +70,6 @@ class TerraformComment:
 
 
     def __repr__(self):
-        #return f'TerraformComment(issue_url={self._issue_url!r}, comment_url={self._comment_url!r}, headers={self._headers!r}, description={self._description!r}, summary={self._summary!r}, body={self._body!r}, status={self._status!r})'
         return f'TerraformComment(issue_url={self._issue_url!r}, comment_url={self._comment_url!r}, headers={self._headers!r}, description={self._description!r}, sections={self._sections!r}, status={self._status!r})'
 
 
@@ -123,8 +117,6 @@ def serialize(comment: TerraformComment) -> str:
         'headers': comment.headers,
         'description': comment.description,
         'sections': comment.sections,
-        # 'summary': comment.summary,
-        # 'body': comment.body,
         'status': comment.status
     })
 
@@ -138,8 +130,6 @@ def deserialize(s) -> TerraformComment:
         headers=j['headers'],
         description=j['description'],
         sections=j['sections'],
-        # summary=j['summary'],
-        # body=j['body'],
         status=j['status']
     )
 
@@ -194,8 +184,6 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
         headers=_parse_comment_header(match.group('headers')),
         description=match.group('description').strip(),
         sections=sections,
-        # summary=match.group('summary').strip(),
-        # body=match.group('body').strip(),
         status=match.group('status').strip()
     )
 
@@ -316,8 +304,6 @@ def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers:
             headers=backup_comment.headers | headers,
             description=backup_comment.description,
             sections=backup_comment.sections,
-            # summary=backup_comment.summary,
-            # body=backup_comment.body,
             status=backup_comment.status
         )
 
@@ -331,8 +317,6 @@ def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers:
             headers={k: v for k, v in headers.items() if v is not None},
             description=legacy_comment.description,
             sections=legacy_comment.sections,
-            # summary=legacy_comment.summary,
-            # body=legacy_comment.body,
             status=legacy_comment.status
         )
 
@@ -343,8 +327,6 @@ def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers:
         headers={k: v for k, v in headers.items() if v is not None},
         description='',
         sections='',
-        # summary='',
-        # body='',
         status=''
     )
 
@@ -356,16 +338,11 @@ def update_comment(
     headers: dict[str, str] = None,
     description: str = None,
     sections: List[dict] = None,
-    # summary: List[str] = None,
-    # body: str = None,
     status: str = None
 ) -> TerraformComment:
 
     new_headers = headers if headers is not None else comment.headers
     new_headers['version'] = version
-
-
-    # new_summary = "\n\n".join(summary) if summary is not None else comment.summary
 
     new_comment = TerraformComment(
         issue_url=comment.issue_url,
@@ -373,7 +350,6 @@ def update_comment(
         headers=new_headers,
         description=description if description is not None else comment.description,
         sections=sections if sections is not None else comment.sections,
-        # body=body if body is not None else comment.body,
         status=status if status is not None else comment.status
     )
 
