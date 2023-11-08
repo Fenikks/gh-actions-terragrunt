@@ -13,7 +13,7 @@ name: 🤞 Auto merge release
 
 jobs:
   auto-merge:
-    if: github.actor == 'vbnetadmin' && startsWith(github.head_ref, 'release-please--')
+    if: startsWith(github.head_ref, 'release-please--')
     runs-on: ubuntu-latest
     steps:
       - name: 🤞 Auto-merge pull request
