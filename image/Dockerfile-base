@@ -12,7 +12,6 @@ FROM debian:bullseye-slim as base
 ENV CHECKPOINT_DISABLE=true
 ENV TF_IN_AUTOMATION=true
 ENV TF_INPUT=false
-ENV TF_PLUGIN_CACHE_DIR=/usr/local/share/terraform/plugin-cache
 
 RUN apt-get update  \
  && apt-get install --no-install-recommends -y \
@@ -32,8 +31,6 @@ RUN apt-get update  \
     gpg-agent \
     dirmngr \
  && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p $TF_PLUGIN_CACHE_DIR
 
 COPY --from=tfmask /go/tfmask/release/tfmask /usr/local/bin/tfmask
 ENV TFMASK_RESOURCES_REGEX="(?i)^(random_id|kubernetes_secret|acme_certificate).*$"

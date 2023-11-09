@@ -15,6 +15,7 @@ CommentReactionUrl = NewType('CommentReactionUrl', GitHubUrl)
 
 
 class GithubApi:
+    
     def __init__(self, host: str, token: Optional[str]):
         self._host = host
         self._token = token
@@ -26,6 +27,7 @@ class GithubApi:
 
         self._session.headers['user-agent'] = 'terraform-github-actions'
         self._session.headers['accept'] = 'application/vnd.github.v3+json'
+
 
     def api_request(self, method: str, *args, **kwargs) -> requests.Response:
         response = self._session.request(method, *args, **kwargs)
@@ -53,14 +55,18 @@ class GithubApi:
 
         return response
 
+
     def get(self, path: str, **kwargs: Any) -> Response:
         return self.api_request('GET', path, **kwargs)
+
 
     def post(self, path: str, **kwargs: Any) -> Response:
         return self.api_request('POST', path, **kwargs)
 
+
     def patch(self, path: str, **kwargs: Any) -> Response:
         return self.api_request('PATCH', path, **kwargs)
+
 
     def paged_get(self, url: GitHubUrl, *args, **kwargs) -> Iterable[dict[str, Any]]:
         while True:

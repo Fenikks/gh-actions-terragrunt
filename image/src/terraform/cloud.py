@@ -79,6 +79,7 @@ class TerraformCloudApi:
 
             page_num = body['meta']['pagination']['next-page']
 
+
 def get_full_workspace_name(backend_config: BackendConfig, workspace_name: str) -> str:
 
     if 'prefix' in backend_config['workspaces']:
@@ -91,6 +92,7 @@ def get_full_workspace_name(backend_config: BackendConfig, workspace_name: str) 
 
     else:
         return workspace_name
+
 
 def get_workspaces(backend_config: BackendConfig) -> Iterable[Workspace]:
     """

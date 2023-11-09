@@ -23,6 +23,7 @@ jobs:
           path: ingrastructure
           tg_version: '0.52.4'
           tf_version: '1.5.7'
+          destroy: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

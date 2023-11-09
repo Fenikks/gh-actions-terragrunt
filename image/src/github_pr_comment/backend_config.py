@@ -40,6 +40,7 @@ def read_backend_config_files(init_inputs: InitInputs) -> BackendConfig:
 
     return config
 
+
 def read_backend_config_input(init_inputs: InitInputs) -> BackendConfig:
     """Read any backend config from input variables."""
 
@@ -50,6 +51,7 @@ def read_backend_config_input(init_inputs: InitInputs) -> BackendConfig:
             config[match.group(1)] = match.group(2)
 
     return config
+
 
 def partial_config(action_inputs: InitInputs, module: TerraformModule) -> Tuple[BackendType, BackendConfig]:
     """

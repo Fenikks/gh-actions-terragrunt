@@ -2,7 +2,7 @@ import json
 import os
 import re
 from json import JSONDecodeError
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 from github_actions.api import IssueUrl, GithubApi, CommentUrl
 from github_actions.debug import debug
@@ -42,14 +42,14 @@ class TerraformComment:
 
     """
 
-    def __init__(self, *, issue_url: IssueUrl, comment_url: Optional[CommentUrl], headers: dict[str, str], description: str, summary: str, body: str, status: str):
+    def __init__(self, *, issue_url: IssueUrl, comment_url: Optional[CommentUrl], headers: dict[str, str], description: str, sections: List[dict], status: str):
         self._issue_url = issue_url
         self._comment_url = comment_url
         self._headers = headers
         self._description = description.strip()
-        self._summary = summary.strip()
-        self._body = body.strip()
+        self._sections = sections
         self._status = status.strip()
+
 
     def __eq__(self, other):
         if not isinstance(other, TerraformComment):
@@ -60,20 +60,23 @@ class TerraformComment:
             self._comment_url == other._comment_url and
             self._headers == other._headers and
             self._description == other._description and
-            self._summary == other._summary and
-            self._body == other._body and
+            self._sections == other._sections and
             self._status == other._status
         )
+
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
+
     def __repr__(self):
-        return f'TerraformComment(issue_url={self._issue_url!r}, comment_url={self._comment_url!r}, headers={self._headers!r}, description={self._description!r}, summary={self._summary!r}, body={self._body!r}, status={self._status!r})'
+        return f'TerraformComment(issue_url={self._issue_url!r}, comment_url={self._comment_url!r}, headers={self._headers!r}, description={self._description!r}, sections={self._sections!r}, status={self._status!r})'
+
 
     @property
     def comment_url(self) -> Optional[CommentUrl]:
         return self._comment_url
+
 
     @comment_url.setter
     def comment_url(self, comment_url: CommentUrl) -> None:
@@ -81,29 +84,31 @@ class TerraformComment:
             raise Exception('Can only set url for comments that don\'t exist yet')
         self._comment_url = comment_url
 
+
     @property
     def issue_url(self) -> IssueUrl:
         return self._issue_url
+
 
     @property
     def headers(self) -> dict[str, str]:
         return self._headers
 
+
     @property
     def description(self) -> str:
         return self._description
 
-    @property
-    def summary(self) -> str:
-        return self._summary
 
     @property
-    def body(self) -> str:
-        return self._body
+    def sections(self) -> str:
+        return self._sections
+
 
     @property
     def status(self) -> str:
         return self._status
+
 
 def serialize(comment: TerraformComment) -> str:
     return json.dumps({
@@ -111,10 +116,10 @@ def serialize(comment: TerraformComment) -> str:
         'comment_url': comment.comment_url,
         'headers': comment.headers,
         'description': comment.description,
-        'summary': comment.summary,
-        'body': comment.body,
+        'sections': comment.sections,
         'status': comment.status
     })
+
 
 def deserialize(s) -> TerraformComment:
     j = json.loads(s)
@@ -124,13 +129,14 @@ def deserialize(s) -> TerraformComment:
         comment_url=j['comment_url'],
         headers=j['headers'],
         description=j['description'],
-        summary=j['summary'],
-        body=j['body'],
+        sections=j['sections'],
         status=j['status']
     )
 
+
 def _format_comment_header(**kwargs) -> str:
     return f'<!-- dflook/terraform-github-actions {json.dumps(kwargs, separators=(",",":"))} -->'
+
 
 def _parse_comment_header(comment_header: Optional[str]) -> dict[str, str]:
     if comment_header is None:
@@ -146,20 +152,28 @@ def _parse_comment_header(comment_header: Optional[str]) -> dict[str, str]:
 
 
 def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
+
+    sections = []
+
+    for section_match in re.finditer(r'''
+        <details(?:\sopen)?>\s*
+        (?:<summary>(?P<summary>.*?)</summary>\s*)?
+        ```(?:hcl)?
+        (?P<body>.*?)
+        ```\s*
+        </details>
+    ''', comment['body'], re.VERBOSE | re.DOTALL):
+        section = {
+            'summary': section_match.group('summary').strip() if 'summary' in section_match.groupdict() else None,
+            'body': section_match.group('body').strip()
+        }
+        sections.append(section)
+
     match = re.match(r'''
             (?P<headers><!--.*?-->\n)?
             (?P<description>.*)
-            <details(?:\sopen)?>\s*
-            (?:<summary>(?P<summary>.*?)</summary>\s*)?
-            ```(?:hcl)?
-            (?P<body>.*)
-            ```\s*
-            </details>
             (?P<status>.*)
-        ''',
-        comment['body'],
-        re.VERBOSE | re.DOTALL
-    )
+        ''', comment['body'], re.VERBOSE | re.DOTALL)
 
     if not match:
         return None
@@ -169,8 +183,7 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
         comment_url=comment['url'],
         headers=_parse_comment_header(match.group('headers')),
         description=match.group('description').strip(),
-        summary=match.group('summary').strip(),
-        body=match.group('body').strip(),
+        sections=sections,
         status=match.group('status').strip()
     )
 
@@ -179,26 +192,30 @@ def _to_api_payload(comment: TerraformComment) -> str:
     details_open = False
     hcl_highlighting = False
 
-    if comment.body.startswith('Error'):
-        details_open = True
-    elif 'Plan:' in comment.body:
-        hcl_highlighting = True
-        num_lines = len(comment.body.splitlines())
-        if num_lines < collapse_threshold:
-            details_open = True
-
-    if comment.summary is None:
-        details_open = True
-
     header = _format_comment_header(**comment.headers)
 
     body = f'''{header}
 {comment.description}
+'''
+    
+    for section in comment.sections:
+        section_summary = section.get('summary')
+        section_body = section.get('body')
+
+        if section_body.startswith('Error'):
+            details_open = True
+        elif 'Plan:' in section.get('body'):
+            hcl_highlighting = True
+
+        if section_summary is None:
+            details_open = True
+
+        body += f'''
 <details{' open' if details_open else ''}>
-{f'<summary>{comment.summary}</summary>' if comment.summary is not None else ''}
+{f'<summary>{section_summary}</summary>' if section_summary is not None else ''}
 
 ```{'hcl' if hcl_highlighting else ''}
-{comment.body}
+{section_body}
 ```
 </details>
 '''
@@ -207,6 +224,7 @@ def _to_api_payload(comment: TerraformComment) -> str:
         body += '\n' + comment.status
 
     return body
+
 
 def matching_headers(comment: TerraformComment, headers: dict[str, str]) -> bool:
     """
@@ -224,6 +242,7 @@ def matching_headers(comment: TerraformComment, headers: dict[str, str]) -> bool
             return False
 
     return True
+
 
 def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers: dict[str, str], backup_headers: dict[str, str], legacy_description: str) -> TerraformComment:
     """
@@ -284,8 +303,7 @@ def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers:
             comment_url=backup_comment.comment_url,
             headers=backup_comment.headers | headers,
             description=backup_comment.description,
-            summary=backup_comment.summary,
-            body=backup_comment.body,
+            sections=backup_comment.sections,
             status=backup_comment.status
         )
 
@@ -298,8 +316,7 @@ def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers:
             comment_url=legacy_comment.comment_url,
             headers={k: v for k, v in headers.items() if v is not None},
             description=legacy_comment.description,
-            summary=legacy_comment.summary,
-            body=legacy_comment.body,
+            sections=legacy_comment.sections,
             status=legacy_comment.status
         )
 
@@ -309,8 +326,7 @@ def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers:
         comment_url=None,
         headers={k: v for k, v in headers.items() if v is not None},
         description='',
-        summary='',
-        body='',
+        sections='',
         status=''
     )
 
@@ -321,8 +337,7 @@ def update_comment(
     *,
     headers: dict[str, str] = None,
     description: str = None,
-    summary: str = None,
-    body: str = None,
+    sections: List[dict] = None,
     status: str = None
 ) -> TerraformComment:
 
@@ -334,8 +349,7 @@ def update_comment(
         comment_url=comment.comment_url,
         headers=new_headers,
         description=description if description is not None else comment.description,
-        summary=summary if summary is not None else comment.summary,
-        body=body if body is not None else comment.body,
+        sections=sections if sections is not None else comment.sections,
         status=status if status is not None else comment.status
     )
 

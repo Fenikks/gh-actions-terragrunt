@@ -79,6 +79,7 @@ def read_credentials(creds: str) -> Iterable[Credential]:
                 password=match.group(4).strip()
             )
 
+
 def netrc(credentials: List[Credential]) -> str:
     s = ''
     for cred in credentials:
@@ -86,6 +87,7 @@ def netrc(credentials: List[Credential]) -> str:
         s += f'login {cred.username}\n'
         s += f'password {cred.password}\n'
     return s
+
 
 def main():
     credentials = list(read_credentials(os.environ.get('TERRAFORM_HTTP_CREDENTIALS', '')))

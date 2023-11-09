@@ -34,13 +34,15 @@ env = cast(GithubEnv, os.environ)
 github_token = env['TERRAFORM_ACTIONS_GITHUB_TOKEN']
 github = GithubApi(env.get('GITHUB_API_URL', 'https://api.github.com'), github_token)
 
-ToolProductName = os.environ.get('TOOL_PRODUCT_NAME', 'Terraform')
+ToolProductName = os.environ.get('TOOL_PRODUCT_NAME', 'Terragrunt')
 
 def job_markdown_ref() -> str:
     return f'[{os.environ["GITHUB_WORKFLOW"]} #{os.environ["GITHUB_RUN_NUMBER"]}]({os.environ["GITHUB_SERVER_URL"]}/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]})'
 
+
 def job_workflow_ref() -> str:
     return f'Job {os.environ["GITHUB_WORKFLOW"]} #{os.environ["GITHUB_RUN_NUMBER"]} at {os.environ["GITHUB_SERVER_URL"]}/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]}'
+
 
 def _mask_backend_config(action_inputs: PlanPrInputs) -> Optional[str]:
     bad_words = [
@@ -79,45 +81,13 @@ def format_classic_description(action_inputs: PlanPrInputs) -> str:
 
     label = f'Terraform plan in __{action_inputs["INPUT_PATH"]}__'
 
-    if action_inputs["INPUT_WORKSPACE"] != 'default':
-        label += f' in the __{action_inputs["INPUT_WORKSPACE"]}__ workspace'
-
-    if action_inputs["INPUT_TARGET"]:
-        label += '\nTargeting resources: '
-        label += ', '.join(f'`{res.strip()}`' for res in action_inputs['INPUT_TARGET'].splitlines())
-
-    if action_inputs["INPUT_REPLACE"]:
-        label += '\nReplacing resources: '
-        label += ', '.join(f'`{res.strip()}`' for res in action_inputs['INPUT_REPLACE'].splitlines())
-
     if backend_config := _mask_backend_config(action_inputs):
         label += f'\nWith backend config: `{backend_config}`'
 
-    if action_inputs["INPUT_BACKEND_CONFIG_FILE"]:
-        label += f'\nWith backend config files: `{action_inputs["INPUT_BACKEND_CONFIG_FILE"]}`'
-
-    if action_inputs["INPUT_VAR"]:
-        label += f'\nWith vars: `{action_inputs["INPUT_VAR"]}`'
-
-    if action_inputs["INPUT_VAR_FILE"]:
-        label += f'\nWith var files: `{action_inputs["INPUT_VAR_FILE"]}`'
-
-    if action_inputs["INPUT_VARIABLES"]:
-        stripped_vars = action_inputs["INPUT_VARIABLES"].strip()
-        if '\n' in stripped_vars:
-            label += f'''<details><summary>With variables</summary>
-
-```hcl
-{stripped_vars}
-```
-</details>
-'''
-        else:
-            label += f'\nWith variables: `{stripped_vars}`'
-
     return label
 
-def format_description(action_inputs: PlanPrInputs, sensitive_variables: List[str]) -> str:
+
+def format_description(action_inputs: PlanPrInputs) -> str:    
 
     mode = ''
     if action_inputs["INPUT_DESTROY"] == 'true':
@@ -128,84 +98,75 @@ def format_description(action_inputs: PlanPrInputs, sensitive_variables: List[st
 
     label = f'{ToolProductName} plan in __{action_inputs["INPUT_PATH"]}__'
 
-    if action_inputs["INPUT_WORKSPACE"] != 'default':
-        label += f' in the __{action_inputs["INPUT_WORKSPACE"]}__ workspace'
-
     label += mode
-
-    if action_inputs["INPUT_TARGET"]:
-        label += '\nTargeting resources: '
-        label += ', '.join(f'`{res.strip()}`' for res in action_inputs['INPUT_TARGET'].splitlines())
-
-    if action_inputs["INPUT_REPLACE"]:
-        label += '\nReplacing resources: '
-        label += ', '.join(f'`{res.strip()}`' for res in action_inputs['INPUT_REPLACE'].splitlines())
-
-    if backend_config := _mask_backend_config(action_inputs):
-        label += f'\nWith backend config: `{backend_config}`'
-
-    if action_inputs["INPUT_BACKEND_CONFIG_FILE"]:
-        label += f'\nWith backend config files: `{action_inputs["INPUT_BACKEND_CONFIG_FILE"]}`'
-
-    if action_inputs["INPUT_VAR"]:
-        label += f'\n:warning: Using deprecated var input. Use the variables input instead.'
-        if any(var_name in action_inputs["INPUT_VAR"] for var_name in sensitive_variables):
-            label += f'\nWith vars: (sensitive values)'
-        else:
-            label += f'\nWith vars: `{action_inputs["INPUT_VAR"]}`'
-
-    if action_inputs["INPUT_VAR_FILE"]:
-        label += f'\nWith var files: `{action_inputs["INPUT_VAR_FILE"]}`'
-
-    if action_inputs["INPUT_VARIABLES"]:
-        variables = hcl.loads(action_inputs["INPUT_VARIABLES"])
-
-        # mark sensitive variables
-        variables = {name: Sensitive() if name in sensitive_variables else value for name, value in variables.items()}
-
-        stripped_vars = render_argument_list(variables).strip()
-        if '\n' in stripped_vars:
-            label += f'''<details open><summary>With variables</summary>
-
-```hcl
-{stripped_vars}
-```
-</details>
-'''
-        else:
-            label += f'\nWith variables: `{stripped_vars}`'
 
     return label
 
-def create_summary(plan: Plan, changes: bool=True) -> Optional[str]:
-    summary = None
 
-    to_move = 0
+def create_plan_hashes(folder_path: str, salt: str) -> Optional[List[dict]]:
+    plan_hashes = []
 
-    for line in plan.splitlines():
-        if line.startswith('No changes') or line.startswith('Error'):
-            return line
+    for file in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file)
 
-        if re.match(r'  # \S+ has moved to \S+$', line):
-            to_move += 1
+        hash_section = {}
 
-        if line.startswith('Plan:'):
-            summary = line
+        with open(file_path, 'r') as plan:
+            hash_section['plan_name'] = file
+            hash_section['plan_hash'] = plan_hash(plan.read(), salt)
+            plan_hashes.append(hash_section)
+    print("PRINTING HASHES")
+    print(plan_hashes)
+    return plan_hashes
 
-            if to_move and 'move' not in summary:
-                summary = summary.rstrip('.') + f', {to_move} to move.'
 
-        if line.startswith('Changes to Outputs'):
-            if summary:
-                return summary + ' Changes to Outputs.'
-            else:
-                return 'Changes to Outputs.'
+def create_sections(folder_path: str) -> Optional[List[dict]]:
+    sections = []
 
-    if summary:
-        return summary
+    for file in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file)
+        
+        module_name = file.replace("___","/")
 
-    # Terraform 1.4.0 starting forgetting to print the plan summary
-    return 'Plan generated.' if changes else 'No changes.'
+        section = {}
+        body = []
+        summary = None
+        to_move = 0
+
+        with open(file_path, 'r') as plan:
+            lines = plan.readlines()
+
+            for line in lines:
+                            
+                if line.startswith('No changes') or line.startswith('Error'):
+                    summary = line
+
+                if re.match(r'  # \S+ has moved to \S+$', line):
+                    to_move += 1
+
+                if line.startswith('Plan:'):
+                    summary = line
+                    if to_move and 'move' not in summary:
+                        summary = summary.rstrip('.') + f', {to_move} to move.'
+                
+                if line.startswith('Changes to Outputs'):
+                    if summary:
+                        summary = summary + ' Changes to Outputs.'
+                    else:
+                        summary = line
+                
+                body.append(line)
+            
+        summary = f'{module_name}: {summary}'
+        section['summary'] = summary  
+        section['body'] = ''.join(body)
+        sections.append(section)
+
+    if sections:
+        return sections
+
+    # No sections were found in the folder.
+    return 'Plan generated.'
 
 
 def current_user(actions_env: GithubEnv) -> str:
@@ -286,7 +247,8 @@ def get_pr() -> PrUrl:
 
     return cast(PrUrl, pr_url)
 
-def get_comment(action_inputs: PlanPrInputs, backend_fingerprint: bytes, backup_fingerprint: bytes) -> TerraformComment:
+
+def get_comment(action_inputs: PlanPrInputs) -> TerraformComment:
     if 'comment' in step_cache:
         return deserialize(step_cache['comment'])
 
@@ -296,24 +258,11 @@ def get_comment(action_inputs: PlanPrInputs, backend_fingerprint: bytes, backup_
 
     legacy_description = format_classic_description(action_inputs)
 
-    headers = {
-        'workspace': os.environ.get('INPUT_WORKSPACE', 'default'),
-    }
-
-    if backend_type := os.environ.get('TERRAFORM_BACKEND_TYPE'):
-        if backend_type == 'cloud':
-            backend_type = 'remote'
-        headers['backend_type'] = backend_type
+    headers = {}
 
     headers['label'] = os.environ.get('INPUT_LABEL') or None
 
     plan_modifier = {}
-    if target := os.environ.get('INPUT_TARGET'):
-        plan_modifier['target'] = sorted(t.strip() for t in target.replace(',', '\n', ).split('\n') if t.strip())
-
-    if replace := os.environ.get('INPUT_REPLACE'):
-        plan_modifier['replace'] = sorted(t.strip() for t in replace.replace(',', '\n', ).split('\n') if t.strip())
-
     if os.environ.get('INPUT_DESTROY') == 'true':
         plan_modifier['destroy'] = 'true'
 
@@ -323,10 +272,8 @@ def get_comment(action_inputs: PlanPrInputs, backend_fingerprint: bytes, backup_
 
     backup_headers = headers.copy()
 
-    headers['backend'] = comment_hash(backend_fingerprint, pr_url)
-    backup_headers['backend'] = comment_hash(backup_fingerprint, pr_url)
-
     return find_comment(github, issue_url, username, headers, backup_headers, legacy_description)
+
 
 def is_approved(proposed_plan: str, comment: TerraformComment) -> bool:
 
@@ -336,6 +283,7 @@ def is_approved(proposed_plan: str, comment: TerraformComment) -> bool:
     else:
         debug('Approving plan based on plan text')
         return plan_cmp(proposed_plan, comment.body)
+
 
 def format_plan_text(plan_text: str) -> Tuple[str, str]:
     """
@@ -365,10 +313,11 @@ def format_plan_text(plan_text: str) -> Tuple[str, str]:
     else:
         return 'text', plan_text
 
+
 def main() -> int:
     if len(sys.argv) < 2:
         sys.stderr.write(f'''Usage:
-    STATUS="<status>" {sys.argv[0]} plan <plan.txt
+    STATUS="<status>" {sys.argv[0]} plan
     STATUS="<status>" {sys.argv[0]} status
     {sys.argv[0]} get plan.txt
     {sys.argv[0]} approved plan.txt
@@ -379,44 +328,24 @@ def main() -> int:
 
     action_inputs = cast(PlanPrInputs, os.environ)
 
-    module = load_module(Path(action_inputs.get('INPUT_PATH', '.')))
-
-    backend_type, backend_config = partial_config(action_inputs, module)
-    partial_backend_fingerprint = fingerprint(backend_type, backend_config, os.environ)
-
-    backend_type, backend_config = complete_config(action_inputs, module)
-    backend_fingerprint = fingerprint(backend_type, backend_config, os.environ)
-
-    comment = get_comment(action_inputs, backend_fingerprint, partial_backend_fingerprint)
+    comment = get_comment(action_inputs)
 
     status = cast(Status, os.environ.get('STATUS', ''))
 
     if sys.argv[1] == 'plan':
-        body = cast(Plan, sys.stdin.read().strip())
-        description = format_description(action_inputs, get_sensitive_variables(module))
-
-        only_if_exists = False
-        if action_inputs['INPUT_ADD_GITHUB_COMMENT'] == 'changes-only' and os.environ.get('TF_CHANGES', 'true') == 'false':
-            only_if_exists = True
-
-        if comment.comment_url is None and only_if_exists:
-            debug('Comment doesn\'t already exist - not creating it')
-            return 0
+        plan_path = os.environ.get('PLAN_OUT_DIR')
+        description = format_description(action_inputs)
 
         headers = comment.headers.copy()
         headers['plan_job_ref'] = job_workflow_ref()
-        headers['plan_hash'] = plan_hash(body, comment.issue_url)
-        headers['plan_text_format'], plan_text = format_plan_text(body)
-
-        changes = os.environ.get('TF_CHANGES') == 'true'
+        headers['plan_hashes'] = create_plan_hashes(plan_path, comment.issue_url)
 
         comment = update_comment(
             github,
             comment,
             description=description,
-            summary=create_summary(body, changes),
+            sections=create_sections(plan_path),
             headers=headers,
-            body=plan_text,
             status=status
         )
 

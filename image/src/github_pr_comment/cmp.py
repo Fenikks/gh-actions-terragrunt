@@ -8,6 +8,7 @@ def remove_unchanged_attributes(plan: str) -> str:
 
     return '\n'.join(line for line in plan.splitlines() if not re.match(r'\s+# \(\d+ unchanged attributes hidden\)', line)).strip()
 
+
 def remove_warnings(plan: str) -> str:
     """
     Remove warnings from the plan text
@@ -27,6 +28,7 @@ def remove_warnings(plan: str) -> str:
             plan_summary_reached = True
 
     return '\n'.join(plan_lines).strip()
+
 
 def plan_cmp(a: str, b: str) -> bool:
     return a.strip() == b.strip()

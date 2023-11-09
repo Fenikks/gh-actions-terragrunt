@@ -1,4 +1,4 @@
-name: Release
+name: 📌 Release
 
 on:
   release:
@@ -10,33 +10,31 @@ on:
         description: "Tag to release"
         required: true
 
+env:
+  REGISTRY: "ghcr.io"
+  REPO_NAME: ${{ github.event.repository.name }}
+  USER_NAME: "Alina Freydina"
+  USER_EMAIL: "alina.freydina@gmail.com"
+
 jobs:
   image:
     runs-on: ubuntu-latest
     name: Release Actions
-    env:
-      GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
     steps:
-      - name: Checkout
+      - name: 📦 Checkout
         uses: actions/checkout@v3
 
-      - name: Check tofu actions are up to date
-        run: |
-          python3 tofu/tofuize.py
-          git diff --exit-code
+      - name: 🔑 Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_REGISTRY_TOKEN }}
 
-      - name: Registry login
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-        run: |
-          echo $GITHUB_TOKEN | docker login ghcr.io --username dflook --password-stdin
-          echo $DOCKER_TOKEN | docker login --username danielflook --password-stdin
-
-      - name: Set up Docker Buildx
+      - name: 🔨 Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build action image
+      - name: 🚀 Build action image
         id: image_build
         run: |
           RELEASE_TAG="${{ github.event.release.tag_name }}${{ github.event.inputs.tag_name }}"
@@ -44,8 +42,10 @@ jobs:
           docker buildx build \
             --build-arg FETCH_CHECKSUMS=yes \
             --build-arg VERSION="${RELEASE_TAG:1}" \
-            --tag danielflook/terraform-github-actions:$RELEASE_TAG \
-            --tag ghcr.io/dflook/terraform-github-actions:$RELEASE_TAG \
+            --build-arg FROM_REGISTRY=$REGISTRY \
+            --build-arg FROM_REPO=${GITHUB_REPOSITORY_OWNER,,} \
+            --build-arg FROM_IMAGE=$REPO_NAME \
+            --tag $REGISTRY/${GITHUB_REPOSITORY_OWNER,,}/$REPO_NAME:$RELEASE_TAG \
             --platform linux/amd64,linux/arm64 \
             --attest type=provenance,mode=max,builder-id=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID \
             --push \
@@ -60,25 +60,25 @@ jobs:
           export major=$(echo $RELEASE_TAG | cut -d. -f1)
           export minor=$(echo $RELEASE_TAG | cut -d. -f2)
 
-          git config --global user.name "Daniel Flook"
-          git config --global user.email "daniel@flook.org"
+          git config --global user.name "$USER_NAME"
+          git config --global user.email "$USER_EMAIL"
           
           function prepare_release() {
               rsync -r $GITHUB_WORKSPACE/$action/ $HOME/$action
               rm -rf $HOME/$action/.github
               mkdir $HOME/$action/.github
-              cp $GITHUB_WORKSPACE/.github/FUNDING.yml $HOME/$action/.github/FUNDING.yml
           }
 
           for action in $(cd $GITHUB_WORKSPACE && find . -name action.yaml -printf "%h\n" | sed 's/^.\///'); do
 
-            if git clone https://dflook:$GITHUB_TOKEN@github.com/dflook/$action.git "$HOME/$action"; then
-              echo "Releasing dflook/$action@$RELEASE_TAG"
+            if git clone https://$GITHUB_ACTOR:${{ secrets.GH_REGISTRY_TOKEN }}@github.com/$GITHUB_REPOSITORY_OWNER/$action.git "$HOME/$action"; then
+              echo "Releasing $GITHUB_REPOSITORY_OWNER/$action@$RELEASE_TAG"
 
-              # git tags that use DockerHub for the image
+        
+              # git tags that use GitHub Container Registry for the image
               prepare_release
-              sed -i 's|  image:.*|  image: docker://danielflook/terraform-github-actions@${{ steps.image_build.outputs.digest }}|' $HOME/$action/action.yaml
-
+              sed -i "s|  image:.*|  image: docker://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$REPO_NAME@${{ steps.image_build.outputs.digest }}|" $HOME/$action/action.yaml
+          
               git -C "$HOME/$action" add -A
               git -C "$HOME/$action" commit -m "$RELEASE_TAG"
               git -C "$HOME/$action" tag --force -a -m"$RELEASE_TAG" "$RELEASE_TAG"
@@ -86,31 +86,18 @@ jobs:
               git -C "$HOME/$action" tag --force -a -m"$RELEASE_TAG" "$major.$minor"
               git -C "$HOME/$action" push --force
               git -C "$HOME/$action" push --force --tags
-          
-              # git tags that use GitHub Container Registry for the image
-              git -C "$HOME/$action" checkout ghcr || git -C "$HOME/$action" checkout -b ghcr
-              prepare_release
-              sed -i 's|  image:.*|  image: docker://ghcr.io/dflook/terraform-github-actions@${{ steps.image_build.outputs.digest }}|' $HOME/$action/action.yaml
-          
-              git -C "$HOME/$action" add -A
-              git -C "$HOME/$action" commit -m "$RELEASE_TAG-ghcr"
-              git -C "$HOME/$action" tag --force -a -m"$RELEASE_TAG" "$RELEASE_TAG-ghcr"
-              git -C "$HOME/$action" tag --force -a -m"$RELEASE_TAG" "$major-ghcr"
-              git -C "$HOME/$action" tag --force -a -m"$RELEASE_TAG" "$major.$minor-ghcr"
-              git -C "$HOME/$action" push --set-upstream origin ghcr --force
-              git -C "$HOME/$action" push --force --tags
 
               # Create the github release
               cat $GITHUB_WORKSPACE/.github/release_template.md \
                | envsubst \
                | jq --slurp --raw-input --arg RELEASE_TAG "$RELEASE_TAG" '{"tag_name": $RELEASE_TAG, "name": $RELEASE_TAG, "body": . }' \
                | curl -X POST \
-                   --user dflook:$GITHUB_TOKEN \
+                   --user $GITHUB_ACTOR:${{ secrets.GH_REGISTRY_TOKEN }} \
                    --header "Content-Type: application/json" \
                    --data-binary @- \
-                   "https://api.github.com/repos/dflook/$action/releases"
+                   "https://api.github.com/repos/$GITHUB_REPOSITORY_OWNER/$action/releases"
 
             else
-              echo "Skipping dflook/$action"
+              echo "Skipping $GITHUB_REPOSITORY_OWNER/$action"
             fi
           done
