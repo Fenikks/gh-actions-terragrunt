@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.1.0...v1.2.0) (2023-11-10)
+
+
+### Features
+
+* start work on apply action ([6640c63](https://github.com/Fenikks/gh-actions-terragrunt/commit/6640c637cb08df851485f1437689a16b1cda11fa))
+
 ## [1.1.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.0.0...v1.1.0) (2023-11-08)
 
 
