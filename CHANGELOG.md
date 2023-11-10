@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.2.1...v1.2.2) (2023-11-10)
+
+
+### Bug Fixes
+
+* file permissions ([fadc655](https://github.com/Fenikks/gh-actions-terragrunt/commit/fadc6559bd2bd79b0ebc33af3aa527b9d8ba7f93))
+
+
+### Miscellaneous
+
+* **dev:** release 1.2.1 ([fc39bb5](https://github.com/Fenikks/gh-actions-terragrunt/commit/fc39bb5982636b2d7b39c7da6b3aa0720a60e955))
+
 ## [1.2.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.2.0...v1.2.1) (2023-11-10)
 
 
