@@ -1,5 +1,5 @@
-name: terragrunt-plan-all
-description: Create a Terraform plan
+name: terragrunt-apply-all
+description: Applay a Terraform plan
 author: Alina Freydina
 
 inputs:
