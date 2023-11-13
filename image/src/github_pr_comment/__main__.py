@@ -356,6 +356,8 @@ def main() -> int:
 
     if sys.argv[1] == 'plan':
         description = format_description(action_inputs)
+        print('---- DEBUG MESSAGE printing description ---------')
+        print(description)
 
         headers = comment.headers.copy()
         headers['plan_job_ref'] = job_workflow_ref()
@@ -369,6 +371,8 @@ def main() -> int:
             headers=headers,
             status=status
         )
+        print('---- DEBUG MESSAGE printing comment after update ---------')
+        print(comment) 
 
     elif sys.argv[1] == 'status':
         if comment.comment_url is None:
