@@ -343,6 +343,8 @@ def main() -> int:
 
     plan_path = os.environ.get('PLAN_OUT_DIR')
     action_inputs = cast(PlanPrInputs, os.environ)
+    print('---- DEBUG MESSAGE printing action_inputs ---------')
+    print(action_inputs)
 
     comment = get_comment(action_inputs)
     print('---- DEBUG MESSAGE printing comment ---------')
