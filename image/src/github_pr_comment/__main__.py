@@ -375,7 +375,7 @@ def main() -> int:
         else:
             comment = update_comment(github, comment, status=status)
 
-        print('Printing comment for debug in STATUS')
+        print('---- DEBUG MESSAGE Printing comment for debug in STATUS ---------')
         print(comment) 
 
     elif sys.argv[1] == 'get':
