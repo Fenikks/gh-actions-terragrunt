@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.2.2...v1.3.0) (2023-11-13)
+
+
+### Features
+
+* added function update_status ([e09bbb0](https://github.com/Fenikks/gh-actions-terragrunt/commit/e09bbb04ad284b26b88a66288e7a7a0956fc8ec8))
+
 ## [1.2.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.2.1...v1.2.2) (2023-11-10)
 
 
