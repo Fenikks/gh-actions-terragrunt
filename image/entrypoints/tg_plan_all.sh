@@ -6,7 +6,7 @@ source /usr/local/actions.sh
 debug
 setup
 
-set-common-plan-args
+set_common_plan_args
 
 exec 3>&1
 

@@ -371,6 +371,9 @@ def main() -> int:
         else:
             comment = update_comment(github, comment, status=status)
 
+        print('Printing comment for debug in STATUS')
+        print(comment) 
+
     elif sys.argv[1] == 'get':
         if comment.comment_url is None:
             debug("Can't get the plan from comment that doesn't exist")

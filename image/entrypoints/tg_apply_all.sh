@@ -6,7 +6,7 @@ source /usr/local/actions.sh
 debug
 setup
 
-set-common-plan-args
+set_common_plan_args
 
 if [[ -v TERRAFORM_ACTIONS_GITHUB_TOKEN ]]; then
     update_status ":orange_circle: Applying plan in $(job_markdown_ref)"

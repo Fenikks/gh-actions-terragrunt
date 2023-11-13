@@ -58,10 +58,10 @@ function setup() {
 
     end_group
 
-    detect-tfmask
+    detect_tfmask
 }
 
-function set-common-plan-args() {
+function set_common_plan_args() {
     PLAN_ARGS=""
     PARALLEL_ARG=""
 
@@ -116,13 +116,18 @@ function job_markdown_ref() {
     echo "[${GITHUB_WORKFLOW} #${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
 }
 
-function detect-tfmask() {
+function detect_tfmask() {
     TFMASK="tfmask"
     if ! hash tfmask 2>/dev/null; then
         TFMASK="cat"
     fi
 
     export TFMASK
+}
+
+function output() {
+    debug_log terragrunt run-all output -json
+    (cd "$INPUT_PATH" && terragrunt run-all output -json | convert_output)
 }
 
 function update_status() {
