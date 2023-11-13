@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.3.0...v1.4.0) (2023-11-13)
+
+
+### Features
+
+* add output function ([aed5407](https://github.com/Fenikks/gh-actions-terragrunt/commit/aed5407f60a7755ae6369fc33efbfdd8de02b97f))
+
 ## [1.3.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.2.2...v1.3.0) (2023-11-13)
 
 
