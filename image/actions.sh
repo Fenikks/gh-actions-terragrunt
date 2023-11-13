@@ -125,6 +125,16 @@ function detect-tfmask() {
     export TFMASK
 }
 
+function update_status() {
+    local status="$1"
+
+    if ! STATUS="$status" github_pr_comment status 2>"$STEP_TMP_DIR/github_pr_comment.stderr"; then
+        debug_file "$STEP_TMP_DIR/github_pr_comment.stderr"
+    else
+        debug_file "$STEP_TMP_DIR/github_pr_comment.stderr"
+    fi
+}
+
 function random_string() {
     python3 -c "import random; import string; print(''.join(random.choice(string.ascii_lowercase) for i in range(8)))"
 }
