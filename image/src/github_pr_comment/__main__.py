@@ -328,6 +328,8 @@ def format_plan_text(plan_text: str) -> Tuple[str, str]:
 
 
 def main() -> int:
+
+    print(f'---- DEBUG MESSAGE printing len(sys.argv) {len(sys.argv)} ---------')
     if len(sys.argv) < 2:
         sys.stderr.write(f'''Usage:
     STATUS="<status>" {sys.argv[0]} plan
@@ -343,10 +345,12 @@ def main() -> int:
     action_inputs = cast(PlanPrInputs, os.environ)
 
     comment = get_comment(action_inputs)
-    print('Printing comment for debug')
+    print('---- DEBUG MESSAGE printing comment ---------')
     print(comment) 
 
     status = cast(Status, os.environ.get('STATUS', ''))
+    print('---- DEBUG MESSAGE printing status ---------')
+    print(status)
 
     if sys.argv[1] == 'plan':
         description = format_description(action_inputs)
