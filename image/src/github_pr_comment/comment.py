@@ -170,9 +170,9 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
         sections.append(section)
 
     match = re.match(r'''
+            (?P<status>.*)
             (?P<headers><!--.*?-->\n)?
-            # (?P<description>.*(?=<details>))
-            (?P<description>.*?)(?=\n<details>)
+            (?P<description>.*)
             <details>.*</details>
             (?P<status>.*)
         ''', comment['body'], re.VERBOSE | re.DOTALL)
