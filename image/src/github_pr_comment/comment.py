@@ -172,6 +172,7 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
     match = re.match(r'''
             (?P<headers><!--.*?-->\n)?
             (?P<description>.*)
+            <details>.*</details>
             (?P<status>.*)
         ''', comment['body'], re.VERBOSE | re.DOTALL)
 
@@ -346,7 +347,8 @@ def update_comment(
     print(f'github: {github}')
     print(f'comment: {comment}')
     print(f'headers: {headers}')
-    print(f'description: {sections}')
+    print(f'description: {description}')
+    print(f'sections: {sections}')
     print(f'status: {status}')
 
 
