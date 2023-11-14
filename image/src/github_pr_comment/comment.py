@@ -177,15 +177,15 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
             (?P<status>.*)
         ''', comment['body'], re.VERBOSE | re.DOTALL)
     
+    if not match:
+        return None
+    
     print('---- DEBUG MESSAGE Printing match in from_api_payload ---------')
     print(match)
     print('---- DEBUG MESSAGE Printing match.description in from_api_payload 1---------')
     print(match.group('description'))
     print('---- DEBUG MESSAGE Printing match in from_api_payload 2---------')
     print(match.group('description').strip())
-
-    if not match:
-        return None
 
     return TerraformComment(
         issue_url=comment['issue_url'],
