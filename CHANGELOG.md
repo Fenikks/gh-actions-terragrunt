@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.3](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.5.2...v1.5.3) (2023-11-13)
+
+
+### Bug Fixes
+
+* add debug messages ([cf6f65a](https://github.com/Fenikks/gh-actions-terragrunt/commit/cf6f65a25d547e0d794a42b8fbb095b48c52eece))
+
 ## [1.5.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.5.1...v1.5.2) (2023-11-13)
 
 
