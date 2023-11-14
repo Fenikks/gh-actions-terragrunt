@@ -31,8 +31,12 @@ job_cache = ActionsCache(Path(os.environ.get('JOB_TMP_DIR', '.')), 'job_cache')
 step_cache = ActionsCache(Path(os.environ.get('STEP_TMP_DIR', '.')), 'step_cache')
 
 env = cast(GithubEnv, os.environ)
+print('---- DEBUG MESSAGE Printing env ---------')
+print(env)
 github_token = env['TERRAFORM_ACTIONS_GITHUB_TOKEN']
 github = GithubApi(env.get('GITHUB_API_URL', 'https://api.github.com'), github_token)
+print('---- DEBUG MESSAGE Printing github ---------')
+print(github)
 
 ToolProductName = os.environ.get('TOOL_PRODUCT_NAME', 'Terragrunt')
 
@@ -347,7 +351,7 @@ def main() -> int:
     print(action_inputs)
 
     comment = get_comment(action_inputs)
-    print('---- DEBUG MESSAGE printing comment ---------')
+    print('---- DEBUG MESSAGE printing get_comment result ---------')
     print(comment) 
 
     status = cast(Status, os.environ.get('STATUS', ''))
@@ -375,14 +379,20 @@ def main() -> int:
         print(comment) 
 
     elif sys.argv[1] == 'status':
+        print(f'---- DEBUG MESSAGE inside status sys.argv[1] is {sys.argv[1]} ---------')
         if comment.comment_url is None:
             debug("Can't set status of comment that doesn't exist")
             return 1
         else:
+            print('---- DEBUG MESSAGE updating comment with github, comment, and status ---------')
+            print(github)
+            print('---- DEBUG MESSAGE updating comment with github, comment, and status ---------')
+            print(comment)
+            print('---- DEBUG MESSAGE updating comment with github, comment, and status ---------')
+            print(status)
             comment = update_comment(github, comment, status=status)
-
-        print('---- DEBUG MESSAGE Printing comment for debug in STATUS ---------')
-        print(comment) 
+            print('---- DEBUG MESSAGE Printing comment after update in STATUS ---------')
+            print(comment) 
 
     elif sys.argv[1] == 'get':
         if comment.comment_url is None:

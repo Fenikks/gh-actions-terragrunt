@@ -341,8 +341,20 @@ def update_comment(
     status: str = None
 ) -> TerraformComment:
 
+    print('---- DEBUG MESSAGE inside  update_comment ---------')
+    print('---- DEBUG MESSAGE printing initial vars ---------')
+    print(f'github: {github}')
+    print(f'comment: {comment}')
+    print(f'headers: {headers}')
+    print(f'description: {sections}')
+    print(f'status: {status}')
+
+
     new_headers = headers if headers is not None else comment.headers
+    print('---- DEBUG MESSAGE inside  update_comment ---------')
+    print(f'new_headers: {new_headers}')
     new_headers['version'] = version
+    print(f'new_headers: {new_headers}')
 
     new_comment = TerraformComment(
         issue_url=comment.issue_url,
@@ -353,10 +365,14 @@ def update_comment(
         status=status if status is not None else comment.status
     )
 
+    print(f'new_comment: {new_comment}')
+
     if comment.comment_url is not None:
+        print('---- DEBUG MESSAGE inside  update_comment comment_url is not None---------')
         response = github.patch(comment.comment_url, json={'body': _to_api_payload(new_comment)})
         response.raise_for_status()
     else:
+        print('---- DEBUG MESSAGE inside  update_comment comment_url is None---------')
         response = github.post(comment.issue_url + '/comments', json={'body': _to_api_payload(new_comment)})
         response.raise_for_status()
         new_comment.comment_url = response.json()['url']

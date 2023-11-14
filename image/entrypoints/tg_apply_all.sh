@@ -49,7 +49,7 @@ else
     fi
 
 echo "---------- DEBUG MESSAGE checking if plan is approved ----------"
-    if github_pr_comment approved "$STEP_TMP_DIR/plan.txt"; then
+    if github_pr_comment approved; then
         echo "---------- DEBUG MESSAGE applying plan ----------"
     #   apply
         echo "Plan should be applied"
