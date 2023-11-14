@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.6.0...v1.6.1) (2023-11-14)
+
+
+### Bug Fixes
+
+* function _from_api_payload ([0f892fd](https://github.com/Fenikks/gh-actions-terragrunt/commit/0f892fd7164b1e9486c14a404ac597e9a72ecdea))
+
 ## [1.6.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.5.3...v1.6.0) (2023-11-14)
 
 
