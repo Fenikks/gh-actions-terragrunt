@@ -176,6 +176,13 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
             <details>.*</details>
             (?P<status>.*)
         ''', comment['body'], re.VERBOSE | re.DOTALL)
+    
+    print('---- DEBUG MESSAGE Printing match in from_api_payload ---------')
+    print(match)
+    print('---- DEBUG MESSAGE Printing match.description in from_api_payload 1---------')
+    print(match.group('description'))
+    print('---- DEBUG MESSAGE Printing match in from_api_payload 2---------')
+    print(match.group('description').strip())
 
     if not match:
         return None
@@ -269,6 +276,9 @@ def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers:
     legacy_comment = None
 
     for comment_payload in github.paged_get(issue_url + '/comments'):
+        print('---- DEBUG MESSAGE Printing comment_payload ---------')
+        print(comment_payload)
+
         if comment_payload['user']['login'] != username:
             continue
 
