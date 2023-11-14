@@ -173,8 +173,8 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
             (?P<headers><!--.*?-->\n)?
             # (?P<description>.*(?=<details>))
             (?P<description>.*?)(?=\n<details>)
-            # (?P<status>.*(?<=</details>))
-            (?P<status>(?s)(?<=</details>).*)
+            <details>.*</details>
+            (?P<status>.*)
         ''', comment['body'], re.VERBOSE | re.DOTALL)
 
     if not match:
