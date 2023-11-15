@@ -3,27 +3,18 @@
 # shellcheck source=../actions.sh
 source /usr/local/actions.sh
 
-echo "---------- DEBUG MESSAGE calling debug funcion ----------"
 debug
-
-echo "---------- DEBUG MESSAGE calling setup funcion ----------"
 setup
-
-echo "---------- DEBUG MESSAGE calling set_common_plan-args funcion ----------"
 set_common_plan_args
 
-
 if [[ -v TERRAFORM_ACTIONS_GITHUB_TOKEN ]]; then
-    echo "---------- DEBUG MESSAGE updating status in PR ----------"
     update_status ":orange_circle: Applying plan in $(job_markdown_ref)"
 fi
 
 exec 3>&1
 
-echo "---------- DEBUG MESSAGE creating plan ----------"
 ### Generate a plan
 plan
-
 
 ### Apply the plan
 

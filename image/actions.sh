@@ -94,7 +94,8 @@ function plan() {
     for i in $MODULE_PATHS; do 
         plan_name=${i//.\//}
         plan_name=${plan_name//\//___}
-        terragrunt show plan.out --terragrunt-working-dir $i -no-color|tee $PLAN_OUT_DIR/$plan_name
+        terragrunt show plan.out --terragrunt-working-dir $i -no-color 2>"$STEP_TMP_DIR/terraform_show_plan.stderr" \
+            |tee $PLAN_OUT_DIR/$plan_name
     done
     set -e
 }
