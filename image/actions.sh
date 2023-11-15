@@ -110,6 +110,7 @@ function apply() {
         2>"$STEP_TMP_DIR/terraform_apply.stderr" \
         | $TFMASK
     set -e
+    update_status ":white_check_mark: Plan applied in $(job_markdown_ref)"
 }
 
 function job_markdown_ref() {

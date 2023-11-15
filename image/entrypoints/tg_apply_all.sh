@@ -51,13 +51,10 @@ else
 echo "---------- DEBUG MESSAGE checking if plan is approved ----------"
     if github_pr_comment approved; then
         echo "---------- DEBUG MESSAGE applying plan ----------"
-    #   apply
+        # apply
         echo "Plan should be applied"
     else
         exit 1
     fi
 
 fi
-
-echo "---------- DEBUG MESSAGE ----------"
-output
