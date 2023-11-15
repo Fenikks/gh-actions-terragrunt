@@ -26,10 +26,12 @@ if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "issue_c
             exit 1
         fi
 
-        echo "---------- DEBUG MESSAGE checking plan stauts ----------"
-        echo "status is $STATUS"
+
 
         STATUS=":memo: Plan generated in $(job_markdown_ref)"
+
+        echo "---------- DEBUG MESSAGE checking plan stauts ----------"
+        echo "status is $STATUS"
 
         # Checking plan exit codes
         for code in $(tac $STEP_TMP_DIR/terraform_plan.stderr | awk '/^[[:space:]]*\*/{flag=1; print} flag && /^[[:space:]]*time=/{exit}' | awk '{print $5}'); do
