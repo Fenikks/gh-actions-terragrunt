@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.8.6...v1.9.0) (2023-11-15)
+
+
+### Features
+
+* added check of apply approval ([d9dc17a](https://github.com/Fenikks/gh-actions-terragrunt/commit/d9dc17ab6f40d78a3bdc8be7e35a2002133618f7))
+
 ## [1.8.6](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.8.5...v1.8.6) (2023-11-15)
 
 
