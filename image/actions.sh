@@ -102,11 +102,11 @@ function plan() {
 function apply() {
     
     # shellcheck disable=SC2086
-    debug_log terragrunt run-all apply -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'
+    debug_log terragrunt run-all apply -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS'
 
     set +e
     # shellcheck disable=SC2086
-    (cd "$INPUT_PATH" && terragrunt run-all apply -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
+    (cd "$INPUT_PATH" && terragrunt run-all apply -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS) \
         2>"$STEP_TMP_DIR/terraform_apply.stderr" \
         | $TFMASK
     set -e

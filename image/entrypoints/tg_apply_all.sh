@@ -51,13 +51,13 @@ else
 echo "---------- DEBUG MESSAGE checking if plan is approved ----------"
     if github_pr_comment approved; then
         echo "---------- DEBUG MESSAGE applying plan ----------"
-        # apply
         echo "Plan should be applied"
+        apply
     else
         exit 1
     fi
 
 fi
 
-echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr"
-cat "$STEP_TMP_DIR/terraform_plan.stderr"
+echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_apply.stderr after apply"
+cat "$STEP_TMP_DIR/terraform_apply.stderr"
