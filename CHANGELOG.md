@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.0...v1.9.1) (2023-11-15)
+
+
+### Bug Fixes
+
+* enable apply ([63bf3ce](https://github.com/Fenikks/gh-actions-terragrunt/commit/63bf3ce7678b03344aee358ee1024d331a2a06a6))
+
 ## [1.9.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.8.6...v1.9.0) (2023-11-15)
 
 
