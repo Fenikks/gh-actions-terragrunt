@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.8.1...v1.8.2) (2023-11-15)
+
+
+### Bug Fixes
+
+* added check of plan exit code ([31a5943](https://github.com/Fenikks/gh-actions-terragrunt/commit/31a59439a25be1574d3c45de5d0410cb75527490))
+
 ## [1.8.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.8.0...v1.8.1) (2023-11-15)
 
 
