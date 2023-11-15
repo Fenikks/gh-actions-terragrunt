@@ -58,3 +58,6 @@ echo "---------- DEBUG MESSAGE checking if plan is approved ----------"
     fi
 
 fi
+
+echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr"
+cat "$STEP_TMP_DIR/terraform_plan.stderr"
