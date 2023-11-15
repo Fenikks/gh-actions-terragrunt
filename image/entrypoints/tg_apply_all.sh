@@ -58,6 +58,8 @@ echo "---------- DEBUG MESSAGE checking if plan is approved ----------"
     fi
 
 fi
-
 echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_apply.stderr after apply"
 cat "$STEP_TMP_DIR/terraform_apply.stderr"
+
+echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_apply.stdout after apply"
+cat "$STEP_TMP_DIR/terraform_apply.stdout"
