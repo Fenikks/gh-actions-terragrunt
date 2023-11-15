@@ -109,7 +109,7 @@ function apply() {
     (cd "$INPUT_PATH" && terragrunt run-all apply -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS) \
         2>"$STEP_TMP_DIR/terraform_apply.stderr" \
         | $TFMASK \
-        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout" \
+        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
     set -e
     update_status ":white_check_mark: Plan applied in $(job_markdown_ref)"
 }

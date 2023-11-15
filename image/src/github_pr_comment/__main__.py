@@ -31,12 +31,8 @@ job_cache = ActionsCache(Path(os.environ.get('JOB_TMP_DIR', '.')), 'job_cache')
 step_cache = ActionsCache(Path(os.environ.get('STEP_TMP_DIR', '.')), 'step_cache')
 
 env = cast(GithubEnv, os.environ)
-print('---- DEBUG MESSAGE Printing env ---------')
-print(env)
 github_token = env['TERRAFORM_ACTIONS_GITHUB_TOKEN']
 github = GithubApi(env.get('GITHUB_API_URL', 'https://api.github.com'), github_token)
-print('---- DEBUG MESSAGE Printing github ---------')
-print(github)
 
 ToolProductName = os.environ.get('TOOL_PRODUCT_NAME', 'Terragrunt')
 
@@ -296,6 +292,8 @@ def is_approved(folder_path: str, comment: TerraformComment) -> bool:
             print(f"current plan has is {plan_hash(file_path.read_text().strip(), comment.issue_url)}")
             if hash.get('plan_name') == file:
                 if hash.get('plan_hash') == plan_hash(file_path.read_text().strip(), comment.issue_url):
+                    print('---- DEBUG MESSAGE inside  is_approved ---------')
+                    print('plan hash is matchs')
                     continue
                 else:
                     return False
@@ -348,8 +346,6 @@ def main() -> int:
 
     plan_path = os.environ.get('PLAN_OUT_DIR')
     action_inputs = cast(PlanPrInputs, os.environ)
-    print('---- DEBUG MESSAGE printing action_inputs ---------')
-    print(action_inputs)
 
     comment = get_comment(action_inputs)
     print('---- DEBUG MESSAGE printing get_comment result ---------')
