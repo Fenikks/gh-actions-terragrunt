@@ -44,6 +44,7 @@ if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "issue_c
 
         echo "---------- DEBUG MESSAGE checking plan stauts ----------"
         echo "status is $STATUS"
+        export $STATUS
         if ! github_pr_comment plan ; then
             exit 1
         fi

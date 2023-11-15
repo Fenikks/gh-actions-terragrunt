@@ -356,7 +356,7 @@ def main() -> int:
     print(comment) 
 
     status = cast(Status, os.environ.get('STATUS', ''))
-    print('---- DEBUG MESSAGE printing status ---------')
+    print('---- DEBUG MESSAGE printing status from env var ---------')
     print(status)
 
     if sys.argv[1] == 'plan':
