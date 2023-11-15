@@ -97,6 +97,9 @@ function plan() {
         terragrunt show plan.out --terragrunt-working-dir $i -no-color 2>"$STEP_TMP_DIR/terraform_show_plan.stderr" \
             |tee $PLAN_OUT_DIR/$plan_name
     done
+    echo "---------- DEBUG MESSAGE ls plans ----------"
+    ls -l $PLAN_OUT_DIR/
+    echo "--------------------------------------------"
     set -e
 }
 
