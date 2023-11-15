@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.18](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.6.17...v1.6.18) (2023-11-15)
+
+
+### Bug Fixes
+
+* funcion is_approved ([7a6d366](https://github.com/Fenikks/gh-actions-terragrunt/commit/7a6d3661538ed9704b1e5c69c62f92d970b8c67d))
+
 ## [1.6.17](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.6.16...v1.6.17) (2023-11-14)
 
 
