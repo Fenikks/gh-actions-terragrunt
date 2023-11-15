@@ -16,6 +16,16 @@ exec 3>&1
 ### Generate a plan
 plan
 
+# Check if state is locked
+echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr ----------"
+cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
+echo "--------------------------------------------"
+
+if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
+    update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
+    exit 1
+fi
+
 ### Apply the plan
 
 if [[ "$INPUT_AUTO_APPROVE" == "true" ]]; then
