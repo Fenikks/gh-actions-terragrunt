@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.15...v1.10.0) (2023-11-16)
+
+
+### Features
+
+* first release of plan ([b34c393](https://github.com/Fenikks/gh-actions-terragrunt/commit/b34c393ff4d1cd7e2c2b84b8256e65b963e126c3))
+
 ## [1.9.15](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.14...v1.9.15) (2023-11-16)
 
 
