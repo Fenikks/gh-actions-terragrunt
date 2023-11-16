@@ -9,6 +9,7 @@ This is a suite of terragrunt related GitHub Actions that can be used together t
 See the documentation for the available actions:
 
 - [Fenikks/terragrunt-plan-all](terragrunt-plan-all)
+- [Fenikks/terragrunt-apply-all](terragrunt-apply-all)
 
 
 ## Example Usage
@@ -53,4 +54,35 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+```
+
+#### apply.yaml
+This workflow runs when the PR is merged into the main branch, and applies the planned changes.
+
+```yaml
+name: Apply terraform plan
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    name: Apply terraform plan
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: terraform apply
+        uses: dflook/terraform-apply@v1
+        with:
+          path: my-terraform-config
 ```
