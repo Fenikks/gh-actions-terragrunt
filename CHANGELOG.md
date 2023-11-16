@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.7](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.6...v1.9.7) (2023-11-16)
+
+
+### Bug Fixes
+
+* check plan  exit code ([a04114f](https://github.com/Fenikks/gh-actions-terragrunt/commit/a04114fb4523cedc3e43ec6a4751352646f1553a))
+* check plan  exit code ([476c348](https://github.com/Fenikks/gh-actions-terragrunt/commit/476c348435c3ca14285e806a80cd52dc50d49119))
+
 ## [1.9.6](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.5...v1.9.6) (2023-11-16)
 
 
