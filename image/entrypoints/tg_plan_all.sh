@@ -14,12 +14,16 @@ exec 3>&1
 plan
 
 # Check if state is locked
+start_group "Output of terraform_plan.stderr"
 echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr ----------"
 cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
 echo "--------------------------------------------"
+end_group
+start_group "Output of terraform_show_plan.stderr"
 echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_show_plan.stderr ----------"
 cat >&2 "$STEP_TMP_DIR/terraform_show_plan.stderr"
 echo "--------------------------------------------"
+end_group
 
 if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
     update_status ":x: Failed to generate plan in $(job_markdown_ref)(State is locked)"

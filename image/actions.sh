@@ -86,10 +86,11 @@ function plan() {
 
     set +e
     # shellcheck disable=SC2086
+    start_group "Generating plan"
     (cd "$INPUT_PATH" && terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
         2>"$STEP_TMP_DIR/terraform_plan.stderr" \
         | $TFMASK 
-        
+    end_group
     # shellcheck disable=SC2034
     for i in $MODULE_PATHS; do 
         plan_name=${i//.\//}
@@ -97,9 +98,6 @@ function plan() {
         terragrunt show plan.out --terragrunt-working-dir $i -no-color 2>"$STEP_TMP_DIR/terraform_show_plan.stderr" \
             |tee $PLAN_OUT_DIR/$plan_name
     done
-    echo "---------- DEBUG MESSAGE ls plans ----------"
-    ls -l $PLAN_OUT_DIR/
-    echo "--------------------------------------------"
     set -e
 }
 
@@ -109,13 +107,14 @@ function apply() {
     debug_log terragrunt run-all apply -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS'
 
     set +e
+    start_group "Applying plan"
     # shellcheck disable=SC2086
     (cd "$INPUT_PATH" && terragrunt run-all apply -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS) \
         2>"$STEP_TMP_DIR/terraform_apply.stderr" \
         | $TFMASK \
         | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
+    end_group
     set -e
-    update_status ":white_check_mark: Plan applied in $(job_markdown_ref)"
 }
 
 function job_markdown_ref() {

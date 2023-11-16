@@ -16,6 +16,11 @@ exec 3>&1
 ### Generate a plan
 plan
 
+echo "---------- DEBUG MESSAGE call aws cli ----------"
+aws sts get-caller-identity
+echo "--------------------------------------------"
+
+
 # Check if state is locked
 echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr ----------"
 cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
@@ -59,8 +64,33 @@ echo "---------- DEBUG MESSAGE checking if plan is approved ----------"
     fi
 
 fi
+
+start_group "Output of terraform_apply.stderr"
 echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_apply.stderr after apply"
 cat "$STEP_TMP_DIR/terraform_apply.stderr"
+echo "--------------------------------------------"
+end_group
 
+start_group "Output of terraform_apply.stdout"
 echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_apply.stdout after apply"
 cat "$STEP_TMP_DIR/terraform_apply.stdout"
+echo "--------------------------------------------"
+end_group
+
+# check if there are errors in terraform_apply.stderr
+
+if lock-info "$STEP_TMP_DIR/terraform_apply.stderr"; then
+    update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
+    exit 1
+else
+    for code in $(tac $STEP_TMP_DIR/terraform_apply.stderr | awk '/^[[:space:]]*\*/{flag=1; print} flag && /^[[:space:]]*time=/{exit}' | awk '{print $5}'); do
+        echo "---------- DEBUG MESSAGE checking plan exit code ----------"
+        echo "code is $code"
+        if [[ $code -eq 1 ]]; then
+            update_status ":x: Error applying plan in $(job_markdown_ref)"
+            exit 1
+        fi
+    done
+fi
+
+update_status ":white_check_mark: Plan applied in $(job_markdown_ref)"
