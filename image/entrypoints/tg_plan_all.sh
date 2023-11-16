@@ -13,11 +13,20 @@ exec 3>&1
 ### Generate a plan
 plan
 
-echo "### output of $STEP_TMP_DIR/terraform_plan.stderr"
-cat "$STEP_TMP_DIR/terraform_plan.stderr"
+# Check if state is locked
+echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr ----------"
+cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
+echo "--------------------------------------------"
+echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_show_plan.stderr ----------"
+cat >&2 "$STEP_TMP_DIR/terraform_show_plan.stderr"
+echo "--------------------------------------------"
 
-echo "### output of $STEP_TMP_DIR/terraform_show_plan.stderr"
-cat "$STEP_TMP_DIR/terraform_show_plan.stderr"
+if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
+    update_status ":x: Failed to generate plan in $(job_markdown_ref)(State is locked)"
+    exit 1
+fi
+
+
 
 if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "issue_comment" || "$GITHUB_EVENT_NAME" == "pull_request_review_comment" || "$GITHUB_EVENT_NAME" == "pull_request_target" || "$GITHUB_EVENT_NAME" == "pull_request_review" || "$GITHUB_EVENT_NAME" == "repository_dispatch" ]]; then
     if [[ "$INPUT_ADD_GITHUB_COMMENT" == "true" || "$INPUT_ADD_GITHUB_COMMENT" == "changes-only" ]]; then
