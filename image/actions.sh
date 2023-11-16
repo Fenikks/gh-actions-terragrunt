@@ -92,7 +92,7 @@ function plan() {
         | $TFMASK 
     end_group
 
-    start_group "Generating plan output"
+    start_group "Generating plan it text format"
     # shellcheck disable=SC2034
     for i in $MODULE_PATHS; do 
         plan_name=${i//.\//}

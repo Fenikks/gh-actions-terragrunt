@@ -5,7 +5,6 @@ source /usr/local/actions.sh
 
 debug
 setup
-
 set_common_plan_args
 
 exec 3>&1
@@ -13,24 +12,19 @@ exec 3>&1
 ### Generate a plan
 plan
 
-# Check if state is locked
-start_group "Output of terraform_plan.stderr"
-echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr ----------"
+start_group "Content of terraform_plan.stderr"
 cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
-echo "--------------------------------------------"
-end_group
-start_group "Output of terraform_show_plan.stderr"
-echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_show_plan.stderr ----------"
-cat >&2 "$STEP_TMP_DIR/terraform_show_plan.stderr"
-echo "--------------------------------------------"
 end_group
 
+start_group "Content of terraform_show_plan.stderr"
+cat >&2 "$STEP_TMP_DIR/terraform_show_plan.stderr"
+end_group
+
+# Check if state is locked  
 if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
     update_status ":x: Failed to generate plan in $(job_markdown_ref)(State is locked)"
     exit 1
 fi
-
-
 
 if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "issue_comment" || "$GITHUB_EVENT_NAME" == "pull_request_review_comment" || "$GITHUB_EVENT_NAME" == "pull_request_target" || "$GITHUB_EVENT_NAME" == "pull_request_review" || "$GITHUB_EVENT_NAME" == "repository_dispatch" ]]; then
     if [[ "$INPUT_ADD_GITHUB_COMMENT" == "true" || "$INPUT_ADD_GITHUB_COMMENT" == "changes-only" ]]; then
@@ -42,24 +36,15 @@ if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "issue_c
             exit 1
         fi
 
-
-
         STATUS=":memo: Plan generated in $(job_markdown_ref)"
-
-        echo "---------- DEBUG MESSAGE checking plan stauts ----------"
-        echo "status is $STATUS"
 
         # Checking plan exit codes
         for code in $(tac $STEP_TMP_DIR/terraform_plan.stderr | awk '/^[[:space:]]*\*/{flag=1; print} flag && /^[[:space:]]*time=/{exit}' | awk '{print $5}'); do
-            echo "---------- DEBUG MESSAGE checking plan exit code ----------"
-            echo "code is $code"
             if [[ $code -eq 1 ]]; then
                 STATUS=":x: Failed to generate plan in $(job_markdown_ref)"
             fi
         done
 
-        echo "---------- DEBUG MESSAGE checking plan stauts ----------"
-        echo "status is $STATUS"
         export STATUS
         if ! github_pr_comment plan ; then
             exit 1
