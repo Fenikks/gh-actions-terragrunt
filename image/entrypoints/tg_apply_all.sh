@@ -16,16 +16,17 @@ exec 3>&1
 ### Generate a plan
 plan
 
+start_group "TEMP test aws"
 echo "---------- DEBUG MESSAGE call aws cli ----------"
 set +e
 cd /tmp
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+unzip /tmp/awscliv2.zip -d /tmp > /dev/null
+/tmp/aws/install
 aws sts get-caller-identity
 set -e
 echo "--------------------------------------------"
-
+end_group
 
 # Check if state is locked
 start_group "Output of terraform_plan.stderr"

@@ -91,6 +91,8 @@ function plan() {
         2>"$STEP_TMP_DIR/terraform_plan.stderr" \
         | $TFMASK 
     end_group
+
+    start_group "Generating plan output"
     # shellcheck disable=SC2034
     for i in $MODULE_PATHS; do 
         plan_name=${i//.\//}
@@ -98,6 +100,7 @@ function plan() {
         terragrunt show plan.out --terragrunt-working-dir $i -no-color 2>"$STEP_TMP_DIR/terraform_show_plan.stderr" \
             |tee $PLAN_OUT_DIR/$plan_name
     done
+    end_group
     set -e
 }
 
