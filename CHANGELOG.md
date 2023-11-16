@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.15](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.14...v1.9.15) (2023-11-16)
+
+
+### Bug Fixes
+
+* added aws cli for test ([ec046ee](https://github.com/Fenikks/gh-actions-terragrunt/commit/ec046ee9bd039ef163ad3192a8e120a638549a33))
+
 ## [1.9.14](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.13...v1.9.14) (2023-11-16)
 
 
