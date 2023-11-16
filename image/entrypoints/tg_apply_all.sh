@@ -17,7 +17,9 @@ exec 3>&1
 plan
 
 echo "---------- DEBUG MESSAGE call aws cli ----------"
+set +e
 aws sts get-caller-identity
+set -e
 echo "--------------------------------------------"
 
 
