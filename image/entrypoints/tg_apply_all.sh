@@ -24,9 +24,11 @@ echo "--------------------------------------------"
 
 
 # Check if state is locked
+start_group "Output of terraform_plan.stderr"
 echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr ----------"
 cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
 echo "--------------------------------------------"
+end_group
 
 if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
     update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"

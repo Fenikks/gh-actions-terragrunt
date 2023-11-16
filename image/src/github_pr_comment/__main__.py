@@ -107,18 +107,12 @@ def create_plan_hashes(folder_path: str, salt: str) -> Optional[List[dict]]:
     plan_hashes = []
 
     for file in os.listdir(folder_path):
-        # file_path = os.path.join(folder_path, file)
         file_path = Path(os.path.join(folder_path, file)) 
         hash_section = {}
-
         hash_section['plan_name'] = file
         hash_section['plan_hash'] = plan_hash(file_path.read_text().strip(), salt)
         plan_hashes.append(hash_section)
 
-        # with open(file_path, 'r') as plan:
-        #     hash_section['plan_name'] = file
-        #     hash_section['plan_hash'] = plan_hash(plan.read(), salt)
-        #     plan_hashes.append(hash_section)
     print("PRINTING HASHES")
     print(plan_hashes)
     return plan_hashes
@@ -286,14 +280,8 @@ def is_approved(folder_path: str, comment: TerraformComment) -> bool:
         
         print(f"file is {file_path}")
         for hash in comment.headers.get('plan_hashes'):
-            print('---- DEBUG MESSAGE inside  is_approved ---------')
-            print(f"plan_name in hash section is {hash.get('plan_name')}")
-            print(f"plan_hash in hash section is {hash.get('plan_hash')}")
-            print(f"current plan has is {plan_hash(file_path.read_text().strip(), comment.issue_url)}")
             if hash.get('plan_name') == file:
                 if hash.get('plan_hash') == plan_hash(file_path.read_text().strip(), comment.issue_url):
-                    print('---- DEBUG MESSAGE inside  is_approved ---------')
-                    print('plan hash is matchs')
                     continue
                 else:
                     return False
@@ -332,7 +320,6 @@ def format_plan_text(plan_text: str) -> Tuple[str, str]:
 
 def main() -> int:
 
-    print(f'---- DEBUG MESSAGE printing len(sys.argv) {len(sys.argv)} ---------')
     if len(sys.argv) < 2:
         sys.stderr.write(f'''Usage:
     STATUS="<status>" {sys.argv[0]} plan
@@ -348,17 +335,11 @@ def main() -> int:
     action_inputs = cast(PlanPrInputs, os.environ)
 
     comment = get_comment(action_inputs)
-    print('---- DEBUG MESSAGE printing get_comment result ---------')
-    print(comment) 
 
     status = cast(Status, os.environ.get('STATUS', ''))
-    print('---- DEBUG MESSAGE printing status from env var ---------')
-    print(status)
 
     if sys.argv[1] == 'plan':
         description = format_description(action_inputs)
-        print('---- DEBUG MESSAGE printing description ---------')
-        print(description)
 
         headers = comment.headers.copy()
         headers['plan_job_ref'] = job_workflow_ref()
@@ -372,24 +353,13 @@ def main() -> int:
             headers=headers,
             status=status
         )
-        print('---- DEBUG MESSAGE printing comment after update ---------')
-        print(comment) 
 
     elif sys.argv[1] == 'status':
-        print(f'---- DEBUG MESSAGE inside status sys.argv[1] is {sys.argv[1]} ---------')
         if comment.comment_url is None:
             debug("Can't set status of comment that doesn't exist")
             return 1
         else:
-            print('---- DEBUG MESSAGE updating comment with github, comment, and status ---------')
-            print(github)
-            print('---- DEBUG MESSAGE updating comment with github, comment, and status ---------')
-            print(comment)
-            print('---- DEBUG MESSAGE updating comment with github, comment, and status ---------')
-            print(status)
             comment = update_comment(github, comment, status=status)
-            print('---- DEBUG MESSAGE Printing comment after update in STATUS ---------')
-            print(comment) 
 
     elif sys.argv[1] == 'get':
         if comment.comment_url is None:
@@ -400,12 +370,10 @@ def main() -> int:
             f.write(comment.body)
 
     elif sys.argv[1] == 'approved':
-
         
         if comment.comment_url is None:
             sys.stdout.write("Plan not found on PR\n")
             sys.stdout.write("Generate the plan first using the Fenikks/terragrunt-plan-all action. Alternatively set the auto_approve input to 'true'\n")
-            # sys.stdout.write("If dflook/terraform-plan was used with add_github_comment set to changes-only, this may mean the plan has since changed to include changes\n")
             output('failure-reason', 'plan-changed')
             sys.exit(1)
 
@@ -423,34 +391,6 @@ def main() -> int:
             sys.stdout.write("Not applying the plan - it has changed from the plan on the PR\n")
             sys.stdout.write("The plan on the PR must be up to date. Alternatively, set the auto_approve input to 'true' to apply outdated plans\n")
             comment = update_comment(github, comment, status=f':x: Plan not applied in {job_markdown_ref()} (Plan has changed)')
-
-#             approved_plan_path = os.path.join(os.environ['STEP_TMP_DIR'], 'approved-plan.txt')
-#             with open(approved_plan_path, 'w') as f:
-#                 f.write(comment.body.strip())
-#             proposed_plan_path = os.path.join(os.environ['STEP_TMP_DIR'], 'proposed-plan.txt')
-#             with open(proposed_plan_path, 'w') as f:
-#                 _, formatted_proposed_plan = format_plan_text(proposed_plan.strip())
-#                 f.write(formatted_proposed_plan.strip())
-
-#             debug(f'diff {proposed_plan_path} {approved_plan_path}')
-#             diff_complete = subprocess.run(['diff', proposed_plan_path, approved_plan_path], check=False, capture_output=True, encoding='utf-8')
-#             sys.stdout.write(diff_complete.stdout)
-#             sys.stderr.write(diff_complete.stderr)
-
-#             if diff_complete.returncode != 0:
-#                 sys.stdout.write("""Performing diff between the pull request plan and the plan generated at execution time.
-# > are lines from the plan in the pull request
-# < are lines from the plan generated at execution
-# Plan differences:
-# """)
-
-            # if comment.headers.get('plan_text_format', 'text') == 'trunc':
-            #     sys.stdout.write('\nThe plan text was too large for a PR comment, not all differences may be shown here.')
-
-            # if plan_ref := comment.headers.get('plan_job_ref'):
-            #     sys.stdout.write(f'\nCompare with the plan generated by the dflook/terraform-plan action in {plan_ref}\n')
-
-            # output('failure-reason', 'plan-changed')
 
             step_cache['comment'] = serialize(comment)
             return 1
