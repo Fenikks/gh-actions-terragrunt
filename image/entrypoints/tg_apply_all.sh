@@ -19,6 +19,9 @@ plan
 start_group "TEMP test aws"
 echo "---------- DEBUG MESSAGE call aws cli ----------"
 set +e
+
+export AWS_REGION=us-east-1
+env|grep AWS_SECRET_ACCESS_KEY
 aws sts get-caller-identity
 set -e
 echo "--------------------------------------------"

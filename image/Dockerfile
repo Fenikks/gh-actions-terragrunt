@@ -9,10 +9,6 @@ ARG TARGETARCH
 ARG FETCH_CHECKSUMS
 ARG VERSION=99.0.0
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" \
-    && unzip /tmp/awscliv2.zip -d /tmp \
-    && /tmp/aws/install
-
 RUN gpg --recv-keys C874011F0AB405110D02105534365D9472D7468F \
  && echo "C874011F0AB405110D02105534365D9472D7468F:6:" | gpg --import-ownertrust
 RUN gpg --check-trustdb
@@ -23,6 +19,10 @@ RUN sed -i "s|version='.*'|version=\'${VERSION}\'|" /tmp/setup.py \
  && pip install /tmp \
  && rm -rf /tmp/src /tmp/setup.py
 
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" \
+    && unzip /tmp/awscliv2.zip -d /tmp \
+    && /tmp/aws/install
+    
 COPY entrypoints/ /entrypoints/
 COPY actions.sh /usr/local/actions.sh
 COPY workflow_commands.sh /usr/local/workflow_commands.sh
