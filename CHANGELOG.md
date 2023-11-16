@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0 (2023-11-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* release apply ([#72](https://github.com/Fenikks/gh-actions-terragrunt/issues/72))
+
+### Features
+
+* release apply ([#72](https://github.com/Fenikks/gh-actions-terragrunt/issues/72)) ([17ad1fc](https://github.com/Fenikks/gh-actions-terragrunt/commit/17ad1fc042af67bf9b8bf3f6ccc0ad2a8a789f7c))
+* terragrant-plan-all ([#18](https://github.com/Fenikks/gh-actions-terragrunt/issues/18)) ([2c870d4](https://github.com/Fenikks/gh-actions-terragrunt/commit/2c870d46a99383c85f4280ac9fc365904fc6484f))
+
 ## [1.1.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.0.0...v1.1.0) (2023-11-08)
 
 
