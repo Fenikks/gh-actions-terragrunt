@@ -19,6 +19,10 @@ RUN sed -i "s|version='.*'|version=\'${VERSION}\'|" /tmp/setup.py \
  && pip install /tmp \
  && rm -rf /tmp/src /tmp/setup.py
 
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" \
+    && unzip /tmp/awscliv2.zip -d /tmp \
+    && /tmp/aws/install
+    
 COPY entrypoints/ /entrypoints/
 COPY actions.sh /usr/local/actions.sh
 COPY workflow_commands.sh /usr/local/workflow_commands.sh
@@ -38,7 +42,3 @@ COPY tools/github_comment_react.py /usr/local/bin/github_comment_react
 #  && ln -s /usr/bin/git-credential-actions /usr/bin/netrc-credential-actions
 
 LABEL org.opencontainers.image.title="GitHub actions for terragrunt"
-
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" \
-    && unzip /tmp/awscliv2.zip -d /tmp \
-    && /tmp/aws/install
