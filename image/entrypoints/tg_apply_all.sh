@@ -16,17 +16,6 @@ exec 3>&1
 ### Generate a plan
 plan
 
-start_group "TEMP test aws"
-echo "---------- DEBUG MESSAGE call aws cli ----------"
-set +e
-
-export AWS_REGION=us-east-1
-env|grep AWS_SECRET_ACCESS_KEY
-aws sts get-caller-identity
-set -e
-echo "--------------------------------------------"
-end_group
-
 # Check if state is locked
 start_group "Output of terraform_plan.stderr"
 echo "---------- DEBUG MESSAGE output of $STEP_TMP_DIR/terraform_plan.stderr ----------"
@@ -38,6 +27,37 @@ if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
     update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
     exit 1
 fi
+
+
+
+
+start_group "TEMP test aws"
+echo "---------- DEBUG MESSAGE call aws cli ----------"
+set +e
+
+export AWS_REGION=us-east-1
+env|grep AWS_SECRET_ACCESS_KEY
+aws sts get-caller-identity
+
+
+aws dynamodb scan --table-name test-repo-state-lock-test-tg-gh-actions
+
+# normal
+aws dynamodb delete-item \
+--table-name test-repo-state-lock-test-tg-gh-actions \
+--key '{"LockID":{"S":"test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate-md5"}}'
+
+# lock
+aws dynamodb put-item \
+--table-name test-repo-state-lock-test-tg-gh-actions \
+--item '{
+  "LockID": {"S": "test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate"},
+  "Info": {"S": "Manually inserted test lock"} 
+}'
+set -e
+echo "--------------------------------------------"
+end_group
+
 
 ### Apply the plan
 

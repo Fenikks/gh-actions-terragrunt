@@ -278,7 +278,6 @@ def is_approved(folder_path: str, comment: TerraformComment) -> bool:
     for file in os.listdir(folder_path):
         file_path = Path(os.path.join(folder_path, file)) 
         
-        print(f"file is {file_path}")
         for hash in comment.headers.get('plan_hashes'):
             if hash.get('plan_name') == file:
                 if hash.get('plan_hash') == plan_hash(file_path.read_text().strip(), comment.issue_url):
