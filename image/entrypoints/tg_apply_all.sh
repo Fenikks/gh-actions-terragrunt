@@ -19,10 +19,6 @@ plan
 start_group "TEMP test aws"
 echo "---------- DEBUG MESSAGE call aws cli ----------"
 set +e
-cd /tmp
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
-unzip /tmp/awscliv2.zip -d /tmp > /dev/null
-/tmp/aws/install
 aws sts get-caller-identity
 set -e
 echo "--------------------------------------------"
