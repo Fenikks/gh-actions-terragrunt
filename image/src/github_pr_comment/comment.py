@@ -171,10 +171,10 @@ def _from_api_payload(comment: dict[str, Any]) -> Optional[TerraformComment]:
 
     match = re.match(r'''
             (?P<headers><!--.*?-->\n)?
-            (?P<description>.*)
-            (?P<status>.*)
+            (?P<description>.*?)(?=<details>)
+            <details>.*</details>(?P<status>[\s\S]*)$
         ''', comment['body'], re.VERBOSE | re.DOTALL)
-
+    
     if not match:
         return None
 
@@ -267,6 +267,7 @@ def find_comment(github: GithubApi, issue_url: IssueUrl, username: str, headers:
     legacy_comment = None
 
     for comment_payload in github.paged_get(issue_url + '/comments'):
+
         if comment_payload['user']['login'] != username:
             continue
 
