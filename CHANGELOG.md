@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.8](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.7...v1.9.8) (2023-11-16)
+
+
+### Bug Fixes
+
+* removed unused comments ([9ac01af](https://github.com/Fenikks/gh-actions-terragrunt/commit/9ac01af3ff21795eb35a011ea95c2aae72efba8d))
+
 ## [1.9.7](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.9.6...v1.9.7) (2023-11-16)
 
 
