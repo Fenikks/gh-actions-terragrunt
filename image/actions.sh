@@ -78,7 +78,9 @@ function set_common_plan_args() {
 }
 
 function plan() {
-
+    echo "------ DEBUG MESSAGE ------"
+    echo "inside plan function"
+    echo "---------------------------"
     # shellcheck disable=SC2086
     debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
     MODULE_PATHS=$(terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]')
@@ -187,7 +189,7 @@ PLAN_OUT_DIR="/tmp/plan"
 TG_CACHE_DIR="/tmp/tg_cache_dir"
 JOB_TMP_DIR="$HOME/.gh-actions-terragrunt"
 WORKSPACE_TMP_DIR=".gh-actions-terragrunt/$(random_string)"
-mkdir -p $PLAN_OUT_DIR
+mkdir -p $PLAN_OUT_DIR $TG_CACHE_DIR
 readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR
 export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR
 
