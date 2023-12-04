@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.10](https://github.com/Fenikks/gh-actions-terragrunt/compare/v4.1.9...v4.1.10) (2023-12-04)
+
+
+### Bug Fixes
+
+* ci ([dc39bf0](https://github.com/Fenikks/gh-actions-terragrunt/commit/dc39bf0d73b52f964ef8f7b58c74d7df8581b804))
+
 ## [4.1.9](https://github.com/Fenikks/gh-actions-terragrunt/compare/v4.1.8...v4.1.9) (2023-12-04)
 
 
