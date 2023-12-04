@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v2.0.0...v2.1.0) (2023-12-04)
+
+
+### Features
+
+* added debug messages ([40f4262](https://github.com/Fenikks/gh-actions-terragrunt/commit/40f4262d4c4d6cd2b27bbd36ec5a08a23b02f624))
+
 ## [2.0.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.11.1...v2.0.0) (2023-12-04)
 
 
