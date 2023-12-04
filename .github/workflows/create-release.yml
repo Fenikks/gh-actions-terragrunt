@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   create-release:
-    if: github.event_name == 'push' && !contains(github.event.head_commit.message, 'chore(dev)')
     runs-on: ubuntu-latest
     steps:
       - name: 🎉 Create release
