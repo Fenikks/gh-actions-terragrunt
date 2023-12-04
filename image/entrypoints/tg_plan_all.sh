@@ -14,9 +14,16 @@ echo "------ DEBUG MESSAGE ------"
 echo "------ start plan generation ------"
 plan
 
+
+echo "------ DEBUG MESSAGE ------"
+echo "Start Content of terraform_plan.stderr"
+echo "---------------------------"
 start_group "Content of terraform_plan.stderr"
 cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
 end_group
+echo "------ DEBUG MESSAGE ------"
+echo "End Content of terraform_plan.stderr"
+echo "---------------------------"
 
 start_group "Content of terraform_show_plan.stderr"
 cat >&2 "$STEP_TMP_DIR/terraform_show_plan.stderr"
