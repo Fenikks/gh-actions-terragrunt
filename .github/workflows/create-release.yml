@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   create-release:
-    if: "!startsWith(github.head_ref, 'release-please--')"
+    if: github.event_name == 'push' && github.event.pull_request == null
     runs-on: ubuntu-latest
     steps:
       - name: 🎉 Create release
