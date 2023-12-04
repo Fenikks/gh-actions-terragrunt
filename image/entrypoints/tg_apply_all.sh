@@ -14,6 +14,8 @@ if [[ -v TERRAFORM_ACTIONS_GITHUB_TOKEN ]]; then
 fi
 
 ### Generate a plan
+echo "------ DEBUG MESSAGE ------"
+echo "------ start plan generation ------"
 plan
 
 start_group "Content of terraform_plan.stderr"
