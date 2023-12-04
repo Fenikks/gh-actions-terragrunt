@@ -72,7 +72,7 @@ jobs:
 
           for action in $(cd $GITHUB_WORKSPACE && find . -name action.yaml -printf "%h\n" | sed 's/^.\///'); do
 
-            if git clone https://$GITHUB_ACTOR:${{ secrets.PERSONAL_GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY_OWNER/$action.git "$HOME/$action"; then
+            if git clone https://$GITHUB_ACTOR:${{ secrets.GH_REGISTRY_TOKEN }}@github.com/$GITHUB_REPOSITORY_OWNER/$action.git "$HOME/$action"; then
               echo "Releasing $GITHUB_REPOSITORY_OWNER/$action@$RELEASE_TAG"
 
         
@@ -93,7 +93,7 @@ jobs:
                | envsubst \
                | jq --slurp --raw-input --arg RELEASE_TAG "$RELEASE_TAG" '{"tag_name": $RELEASE_TAG, "name": $RELEASE_TAG, "body": . }' \
                | curl -X POST \
-                   --user $GITHUB_ACTOR:${{ secrets.PERSONAL_GITHUB_TOKEN }} \
+                   --user $GITHUB_ACTOR:${{ secrets.GH_REGISTRY_TOKEN }} \
                    --header "Content-Type: application/json" \
                    --data-binary @- \
                    "https://api.github.com/repos/$GITHUB_REPOSITORY_OWNER/$action/releases"
