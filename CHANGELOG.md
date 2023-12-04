@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v4.0.1...v4.1.0) (2023-12-04)
+
+
+### Features
+
+* fix token ([0bc0a08](https://github.com/Fenikks/gh-actions-terragrunt/commit/0bc0a08bfa0c838c8f1883c15c964328b9442e72))
+
 ## [4.0.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v4.0.0...v4.0.1) (2023-12-04)
 
 
