@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v4.1.0...v4.1.1) (2023-12-04)
+
+
+### Bug Fixes
+
+* actions script ([141e640](https://github.com/Fenikks/gh-actions-terragrunt/commit/141e640bc288cd7825c3b761a99572cc51822397))
+
 ## [4.1.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v4.0.1...v4.1.0) (2023-12-04)
 
 
