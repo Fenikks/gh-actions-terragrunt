@@ -28,6 +28,7 @@ echo "------ DEBUG MESSAGE ------"
 echo "End Content of terraform_plan.stderr"
 echo "---------------------------"
 
+
 start_group "Content of terraform_show_plan.stderr"
 cat >&2 "$STEP_TMP_DIR/terraform_show_plan.stderr"
 end_group
