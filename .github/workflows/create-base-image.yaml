@@ -3,11 +3,10 @@ name: 📍 Update base image
 on:
   push:
     branches:
-      - main
-      - dev
+      - master
     paths:
       - image/Dockerfile-base
-      - .github/workflows/base-image.yaml
+      - .github/workflows/create-base-image.yaml
 
 env:
   REGISTRY: "ghcr.io"
@@ -17,8 +16,6 @@ jobs:
   push_image:
     runs-on: ubuntu-latest
     name: Docker Images
-    env:
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     steps:
       - name: 📦 Checkout
         uses: actions/checkout@v3
@@ -28,7 +25,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_REGISTRY_TOKEN }}
+          password: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
       - name: 🔨 Set up Docker Buildx
         uses: docker/setup-buildx-action@v2

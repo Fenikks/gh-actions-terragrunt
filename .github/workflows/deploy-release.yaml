@@ -1,4 +1,4 @@
-name: 📌 Release
+name: 📌 Deploy release
 
 on:
   release:
@@ -13,8 +13,8 @@ on:
 env:
   REGISTRY: "ghcr.io"
   REPO_NAME: ${{ github.event.repository.name }}
-  USER_NAME: "Alina Freydina"
-  USER_EMAIL: "alina.freydina@gmail.com"
+  USER_NAME: "wayofdev"
+  USER_EMAIL: "the@wayof.dev"
 
 jobs:
   image:
@@ -29,7 +29,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_REGISTRY_TOKEN }}
+          password: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
       - name: 🔨 Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -44,7 +44,7 @@ jobs:
             --build-arg VERSION="${RELEASE_TAG:1}" \
             --build-arg FROM_REGISTRY=$REGISTRY \
             --build-arg FROM_REPO=${GITHUB_REPOSITORY_OWNER,,} \
-            --build-arg FROM_IMAGE=$REPO_NAME \
+            --build-arg FROM_IMAGE=${REPO_NAME}-base \
             --tag $REGISTRY/${GITHUB_REPOSITORY_OWNER,,}/$REPO_NAME:$RELEASE_TAG \
             --platform linux/amd64,linux/arm64 \
             --attest type=provenance,mode=max,builder-id=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID \
@@ -71,7 +71,7 @@ jobs:
 
           for action in $(cd $GITHUB_WORKSPACE && find . -name action.yaml -printf "%h\n" | sed 's/^.\///'); do
 
-            if git clone https://$GITHUB_ACTOR:${{ secrets.GH_REGISTRY_TOKEN }}@github.com/$GITHUB_REPOSITORY_OWNER/$action.git "$HOME/$action"; then
+            if git clone https://$GITHUB_ACTOR:${{ secrets.PERSONAL_GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY_OWNER/$action.git "$HOME/$action"; then
               echo "Releasing $GITHUB_REPOSITORY_OWNER/$action@$RELEASE_TAG"
 
         
@@ -92,7 +92,7 @@ jobs:
                | envsubst \
                | jq --slurp --raw-input --arg RELEASE_TAG "$RELEASE_TAG" '{"tag_name": $RELEASE_TAG, "name": $RELEASE_TAG, "body": . }' \
                | curl -X POST \
-                   --user $GITHUB_ACTOR:${{ secrets.GH_REGISTRY_TOKEN }} \
+                   --user $GITHUB_ACTOR:${{ secrets.PERSONAL_GITHUB_TOKEN }} \
                    --header "Content-Type: application/json" \
                    --data-binary @- \
                    "https://api.github.com/repos/$GITHUB_REPOSITORY_OWNER/$action/releases"
