@@ -10,6 +10,8 @@ set_common_plan_args
 exec 3>&1
 
 ### Generate a plan
+echo "------ DEBUG MESSAGE ------"
+echo "------ start plan generation ------"
 plan
 
 start_group "Content of terraform_plan.stderr"
