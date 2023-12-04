@@ -3,14 +3,13 @@
 # this file is for the labeler workflow job
 # Documentation https://github.com/marketplace/actions/labeler
 
-'type: documentation':
+"type: docs":
   - assets/**/*
   - .github/*
   - ./*.md
 
-'type: maintenance':
-  - .github/**/*
-  - tests/**/*
+"type: maintenance":
+  - .github/workflows/*
 
 ...
 
