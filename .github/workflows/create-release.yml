@@ -22,7 +22,7 @@ jobs:
         id: release
         with:
           token: ${{ secrets.GH_REGISTRY_TOKEN }}
-          release-type: node
+          release-type: simple
           package-name: gh-actions-teragrunt
           default-branch: dev
           changelog-types: |
