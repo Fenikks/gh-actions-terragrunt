@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.7](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.6...v1.10.7) (2023-12-05)
+
+
+### Bug Fixes
+
+* add debug for curl ([5099a09](https://github.com/Fenikks/gh-actions-terragrunt/commit/5099a09b64b22374fd10ba68ffaecb3450107b77))
+
 ## [1.10.6](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.5...v1.10.6) (2023-12-05)
 
 
