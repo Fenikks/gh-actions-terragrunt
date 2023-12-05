@@ -9,7 +9,7 @@ name: 🏷️ Add labels dev
 # https://github.com/actions/labeler/blob/master/README.md
 
 on:  # yamllint disable-line rule:truthy
-  pull_request:
+  # pull_request:
   workflow_dispatch:
 
 
