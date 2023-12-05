@@ -49,23 +49,12 @@ function setup() {
     if [[ -v INPUT_TF_VERSION ]]; then
         TF_VERSION=$INPUT_TF_VERSION
     fi
-
-    echo "------ DEBUG MESSAGE ------"
-    echo "TG_VERSION $TG_VERSION"
-    echo "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64"
-    echo "---------------------------"
-    echo "------ DEBUG MESSAGE ------"
-    echo "TF_VERSION $TF_VERSION"
-    echo "---------------------------"
-
     
     curl -L -o /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64"
     chmod +x /usr/local/bin/terragrunt
     curl -o /tmp/terraform_${TF_VERSION}_linux_amd64.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
     unzip /tmp/terraform_${TF_VERSION}_linux_amd64.zip -d /usr/local/bin/
     chmod +x /usr/local/bin/terraform
-    ls -lh /usr/local/bin
-
     end_group
 
     detect_tfmask
@@ -92,15 +81,10 @@ function plan() {
     echo "inside plan function"
     echo "---------------------------"
     # shellcheck disable=SC2086
-    debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
+    debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-no-auto-init --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
     
-    set +e
-    terragrunt
-    terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH --terragrunt-log-level debug --terragrunt-debug 
-    echo "-----------------------"
-    terragrunt output-module-groups
     MODULE_PATHS=$(terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]')
-    set -e
+
     echo "------ DEBUG MESSAGE ------"
     echo "MODULE_PATHS $MODULE_PATHS"
     echo "---------------------------"
@@ -122,8 +106,6 @@ function plan() {
         plan_name=${i//\//___}
         terragrunt show plan.out --terragrunt-working-dir $i -no-color --terragrunt-download-dir $TG_CACHE_DIR 2>"$STEP_TMP_DIR/terraform_show_plan.stderr" \
             |tee $PLAN_OUT_DIR/$plan_name
-        echo "------ DEBUG MESSAGE ------"
-        echo "terragrunt show plan.out --terragrunt-working-dir $i -no-color --terragrunt-download-dir $TG_CACHE_DIR|tee $PLAN_OUT_DIR/$plan_name"
     done
     end_group
     set -e
