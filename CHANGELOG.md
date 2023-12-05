@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.4](https://github.com/Fenikks/gh-actions-terragrunt/compare/v6.0.3...v6.0.4) (2023-12-05)
+
+
+### Bug Fixes
+
+* pipelines 1 ([1fe8caa](https://github.com/Fenikks/gh-actions-terragrunt/commit/1fe8caa49eb200775e3090e92f0b65898693259f))
+
 ## [6.0.3](https://github.com/Fenikks/gh-actions-terragrunt/compare/v6.0.2...v6.0.3) (2023-12-05)
 
 
