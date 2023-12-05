@@ -95,7 +95,7 @@ function plan() {
     echo "------ DEBUG MESSAGE ------"
     echo "Generating plan"
     echo "---------------------------"
-    (cd "$INPUT_PATH" && terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
+    (cd "$INPUT_PATH" && terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-no-auto-init --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
         2>"$STEP_TMP_DIR/terraform_plan.stderr" \
         | $TFMASK 
     end_group
