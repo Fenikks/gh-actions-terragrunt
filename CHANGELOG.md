@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.14](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.13...v1.10.14) (2023-12-05)
+
+
+### Bug Fixes
+
+* remove no-autoinit ([877f224](https://github.com/Fenikks/gh-actions-terragrunt/commit/877f2240c0afe436ecc51cfe050f0a8ad0f847e2))
+
 ## [1.10.13](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.12...v1.10.13) (2023-12-05)
 
 
