@@ -2,8 +2,7 @@ name: 📌 Deploy release dev
 
 on:
   release:
-    types:
-      - published
+    types: [published]
   # push:
   #   tags:
   #     - 'v*'
