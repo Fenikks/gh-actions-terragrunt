@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v6.0.0...v6.0.1) (2023-12-05)
+
+
+### Bug Fixes
+
+* labels ([a119a0c](https://github.com/Fenikks/gh-actions-terragrunt/commit/a119a0c36881ef53c30791690f65c80c436b08fa))
+
 ## [6.0.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v5.0.0...v6.0.0) (2023-12-05)
 
 
