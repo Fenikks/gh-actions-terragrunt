@@ -1,4 +1,5 @@
 ---
+name: 🏷️ Add labels dev
 
 # This workflow will triage pull requests and apply a label based on the
 # paths that are modified in the pull request.
@@ -8,10 +9,10 @@
 # https://github.com/actions/labeler/blob/master/README.md
 
 on:  # yamllint disable-line rule:truthy
-  # pull_request:
+  pull_request:
   workflow_dispatch:
 
-name: 🏷️ Add labels
+
 
 jobs:
   label:
