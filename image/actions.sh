@@ -50,7 +50,16 @@ function setup() {
         TF_VERSION=$INPUT_TF_VERSION
     fi
 
-    curl -o /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64"
+    echo "------ DEBUG MESSAGE ------"
+    echo "TG_VERSION $TG_VERSION"
+    echo "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64"
+    echo "---------------------------"
+    echo "------ DEBUG MESSAGE ------"
+    echo "TF_VERSION $TF_VERSION"
+    echo "---------------------------"
+
+    
+    curl -v -o /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64"
     chmod +x /usr/local/bin/terragrunt
     curl -o /tmp/terraform_${TF_VERSION}_linux_amd64.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
     unzip /tmp/terraform_${TF_VERSION}_linux_amd64.zip -d /usr/local/bin/
