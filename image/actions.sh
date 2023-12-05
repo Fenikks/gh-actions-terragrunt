@@ -55,6 +55,7 @@ function setup() {
     curl -o /tmp/terraform_${TF_VERSION}_linux_amd64.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
     unzip /tmp/terraform_${TF_VERSION}_linux_amd64.zip -d /usr/local/bin/
     chmod +x /usr/local/bin/terraform
+    ls -l /usr/local/bin
 
     end_group
 
@@ -83,10 +84,14 @@ function plan() {
     echo "---------------------------"
     # shellcheck disable=SC2086
     debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
-    echo "terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]'"
-    terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH --terragrunt-log-level debug --terragrunt-debug |jq -r 'to_entries | .[].value[]' 
+    
+    set +e
+    terragrunt
+    terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH --terragrunt-log-level debug --terragrunt-debug 
+    echo "-----------------------"
+    terragrunt output-module-groups
     MODULE_PATHS=$(terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]')
-
+    set -e
     echo "------ DEBUG MESSAGE ------"
     echo "MODULE_PATHS $MODULE_PATHS"
     echo "---------------------------"
