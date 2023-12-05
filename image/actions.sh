@@ -83,6 +83,8 @@ function plan() {
     echo "---------------------------"
     # shellcheck disable=SC2086
     debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
+    echo "terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]'"
+    terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH --terragrunt-log-level debug --terragrunt-debug |jq -r 'to_entries | .[].value[]' 
     MODULE_PATHS=$(terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]')
 
     echo "------ DEBUG MESSAGE ------"
