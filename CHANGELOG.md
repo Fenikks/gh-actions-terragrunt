@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.10](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.9...v1.10.10) (2023-12-05)
+
+
+### Bug Fixes
+
+* add debut  for tg_version ([733a9cb](https://github.com/Fenikks/gh-actions-terragrunt/commit/733a9cb97a648faef70c2185d114b631fef1ce96))
+
 ## [1.10.9](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.8...v1.10.9) (2023-12-05)
 
 
