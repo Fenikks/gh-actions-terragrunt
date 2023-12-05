@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.1...v1.10.2) (2023-12-05)
+
+
+### Bug Fixes
+
+* enable  automerge ([35063c1](https://github.com/Fenikks/gh-actions-terragrunt/commit/35063c132ab39382e77b22c1bccafcaeba7eb0da))
+
 ## [1.10.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.0...v1.10.1) (2023-12-05)
 
 
