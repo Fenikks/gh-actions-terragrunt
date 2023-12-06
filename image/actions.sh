@@ -123,7 +123,7 @@ function apply() {
     for i in $MODULE_PATHS; do 
         plan_name=${i//\//___}
         echo "------ DEBUG MESSAGE ------"
-        cat $plan_name
+        cat $PLAN_OUT_DIR/$plan_name
         echo "---------------------------"
         if grep -q "No changes." $PLAN_OUT_DIR/$plan_name; then
             echo "------ DEBUG MESSAGE ------"
