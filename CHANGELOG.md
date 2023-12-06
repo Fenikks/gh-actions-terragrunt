@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.14...v1.11.0) (2023-12-06)
+
+
+### Features
+
+* apply plan only if there are changes ([8d249cd](https://github.com/Fenikks/gh-actions-terragrunt/commit/8d249cdcba4b1c104562d6623bc4158aba8fcb62))
+
 ## [1.10.14](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.10.13...v1.10.14) (2023-12-05)
 
 
