@@ -77,25 +77,15 @@ function set_common_plan_args() {
 }
 
 function plan() {
-    echo "------ DEBUG MESSAGE ------"
-    echo "inside plan function"
-    echo "---------------------------"
     # shellcheck disable=SC2086
-    debug_log terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
+    debug_log terragrunt run-all plan --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
     
     MODULE_PATHS=$(terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]')
-
-    echo "------ DEBUG MESSAGE ------"
-    echo "MODULE_PATHS $MODULE_PATHS"
-    echo "---------------------------"
 
     set +e
     # shellcheck disable=SC2086
     start_group "Generating plan"
-    echo "------ DEBUG MESSAGE ------"
-    echo "Generating plan"
-    echo "---------------------------"
-    (cd "$INPUT_PATH" && terragrunt run-all plan -input=false -no-color -detailed-exitcode -lock-timeout=300s --terragrunt-download-dir $TG_CACHE_DIR $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
+    (cd "$INPUT_PATH" && terragrunt run-all plan --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
         2>"$STEP_TMP_DIR/terraform_plan.stderr" \
         | $TFMASK 
     end_group
@@ -109,20 +99,48 @@ function plan() {
     done
     end_group
     set -e
+
+    export MODULE_PATHS
 }
 
 function apply() {
     
+    echo "------ DEBUG MESSAGE ------"
+    echo "MODULE_PATHS $MODULE_PATHS"
+    echo "---------------------------"
+
     # shellcheck disable=SC2086
     debug_log terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS' plan.out
 
     set +e
     start_group "Applying plan"
     # shellcheck disable=SC2086
-    (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
-        2>"$STEP_TMP_DIR/terraform_apply.stderr" \
-        | $TFMASK \
-        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
+    # (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
+    #     2>"$STEP_TMP_DIR/terraform_apply.stderr" \
+    #     | $TFMASK \
+    #     | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
+
+    for i in $MODULE_PATHS; do 
+        plan_name=$PLAN_OUT_DIR/${i//\//___}
+        echo "------ DEBUG MESSAGE ------"
+        cat $plan_name
+        echo "---------------------------"
+        if grep -q "No changes." $plan_name; then
+            echo "------ DEBUG MESSAGE ------"
+            echo "No changes in this module, skiping"
+            echo "---------------------------"
+            continue
+        else
+            echo "------ DEBUG MESSAGE ------"
+            echo "Applying plan"
+            echo "---------------------------"
+
+            terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR --terragrunt-working-dir $i -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out \
+                2>"$STEP_TMP_DIR/terraform_apply_error/${i}.stderr" \
+                | $TFMASK \
+                | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply_stdout/${i}.stdout"
+        fi
+    done
     end_group
     set -e
 }
@@ -188,6 +206,8 @@ TG_CACHE_DIR="/tmp/tg_cache_dir"
 JOB_TMP_DIR="$HOME/.gh-actions-terragrunt"
 WORKSPACE_TMP_DIR=".gh-actions-terragrunt/$(random_string)"
 mkdir -p $PLAN_OUT_DIR $TG_CACHE_DIR
+mkdir -p $STEP_TMP_DIR/terraform_apply_stdout
+mkdir -p $STEP_TMP_DIR/terraform_apply_error
 readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR
 export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR
 
