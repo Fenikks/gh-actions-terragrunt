@@ -14,20 +14,11 @@ if [[ -v TERRAFORM_ACTIONS_GITHUB_TOKEN ]]; then
 fi
 
 ### Generate a plan
-echo "------ DEBUG MESSAGE ------"
-echo "------ start plan generation ------"
 plan
 
-echo "------ DEBUG MESSAGE ------"
-echo "Start Content of terraform_plan.stderr"
-echo "---------------------------"
 start_group "Content of terraform_plan.stderr"
 cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
 end_group
-echo "------ DEBUG MESSAGE ------"
-echo "End Content of terraform_plan.stderr"
-echo "---------------------------"
-
 
 start_group "Content of terraform_show_plan.stderr"
 cat >&2 "$STEP_TMP_DIR/terraform_show_plan.stderr"
@@ -65,31 +56,39 @@ else
     fi
 fi
 
+# start_group "Content of terraform_apply.stderr"
+# for file in $STEP_TMP_DIR/terraform_apply_error
+#     echo "Contetn of $file"
+#     cat $STEP_TMP_DIR/terraform_apply_error/$file
+# end_group
+
 start_group "Content of terraform_apply.stderr"
-for file in $STEP_TMP_DIR/terraform_apply_error
-    echo "Contetn of $file"
-    cat $STEP_TMP_DIR/terraform_apply_error/$file
+cat $STEP_TMP_DIR/terraform_apply.stderr
 end_group
 
+# start_group "Content of terraform_apply.stdout"
+# for file in $STEP_TMP_DIR/terraform_apply_stdout
+#     echo "Contetn of $file"
+#     cat $STEP_TMP_DIR/terraform_apply_stdout/$file
+# end_group
+
 start_group "Content of terraform_apply.stdout"
-for file in $STEP_TMP_DIR/terraform_apply_stdout
-    echo "Contetn of $file"
-    cat $STEP_TMP_DIR/terraform_apply_stdout/$file
+cat $STEP_TMP_DIR/terraform_apply.stdout
 end_group
 
 # check if there are errors in terraform_apply.stderr
 
 
-# if lock-info "$STEP_TMP_DIR/terraform_apply.stderr"; then
-#     update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
-#     exit 1
-# else
-#     for code in $(tac $STEP_TMP_DIR/terraform_apply.stderr | awk '/^[[:space:]]*\*/{flag=1; print} flag && /^[[:space:]]*time=/{exit}' | awk '{print $5}'); do
-#         if [[ $code -eq 1 ]]; then
-#             update_status ":x: Error applying plan in $(job_markdown_ref)"
-#             exit 1
-#         fi
-#     done
-# fi
+if lock-info "$STEP_TMP_DIR/terraform_apply.stderr"; then
+    update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
+    exit 1
+else
+    for code in $(tac $STEP_TMP_DIR/terraform_apply.stderr | awk '/^[[:space:]]*\*/{flag=1; print} flag && /^[[:space:]]*time=/{exit}' | awk '{print $5}'); do
+        if [[ $code -eq 1 ]]; then
+            update_status ":x: Error applying plan in $(job_markdown_ref)"
+            exit 1
+        fi
+    done
+fi
 
 update_status ":white_check_mark: Plan applied in $(job_markdown_ref)"

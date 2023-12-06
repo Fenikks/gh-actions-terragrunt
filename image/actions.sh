@@ -114,33 +114,33 @@ function apply() {
 
     set +e
     start_group "Applying plan"
-    # shellcheck disable=SC2086
-    # (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
-    #     2>"$STEP_TMP_DIR/terraform_apply.stderr" \
-    #     | $TFMASK \
-    #     | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
+    shellcheck disable=SC2086
+    (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
+        2>"$STEP_TMP_DIR/terraform_apply.stderr" \
+        | $TFMASK \
+        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
 
-    for i in $MODULE_PATHS; do 
-        plan_name=$PLAN_OUT_DIR/${i//\//___}
-        echo "------ DEBUG MESSAGE ------"
-        cat $plan_name
-        echo "---------------------------"
-        if grep -q "No changes." $plan_name; then
-            echo "------ DEBUG MESSAGE ------"
-            echo "No changes in this module, skiping"
-            echo "---------------------------"
-            continue
-        else
-            echo "------ DEBUG MESSAGE ------"
-            echo "Applying plan"
-            echo "---------------------------"
+    # for i in $MODULE_PATHS; do 
+    #     plan_name=$PLAN_OUT_DIR/${i//\//___}
+    #     echo "------ DEBUG MESSAGE ------"
+    #     cat $plan_name
+    #     echo "---------------------------"
+    #     if grep -q "No changes." $plan_name; then
+    #         echo "------ DEBUG MESSAGE ------"
+    #         echo "No changes in this module, skiping"
+    #         echo "---------------------------"
+    #         continue
+    #     else
+    #         echo "------ DEBUG MESSAGE ------"
+    #         echo "Applying plan"
+    #         echo "---------------------------"
 
-            terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR --terragrunt-working-dir $i -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out \
-                2>"$STEP_TMP_DIR/terraform_apply_error/${i}.stderr" \
-                | $TFMASK \
-                | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply_stdout/${i}.stdout"
-        fi
-    done
+    #         terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR --terragrunt-working-dir $i -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out \
+    #             2>"$STEP_TMP_DIR/terraform_apply_error/${plan_name}.stderr" \
+    #             | $TFMASK \
+    #             | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply_stdout/${i}.stdout"
+    #     fi
+    # done
     end_group
     set -e
 }
