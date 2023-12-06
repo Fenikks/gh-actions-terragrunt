@@ -121,11 +121,11 @@ function apply() {
     #     | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
 
     for i in $MODULE_PATHS; do 
-        plan_name=$PLAN_OUT_DIR/${i//\//___}
+        plan_name=${i//\//___}
         echo "------ DEBUG MESSAGE ------"
         cat $plan_name
         echo "---------------------------"
-        if grep -q "No changes." $plan_name; then
+        if grep -q "No changes." $PLAN_OUT_DIR/$plan_name; then
             echo "------ DEBUG MESSAGE ------"
             echo "No changes in this module, skiping"
             echo "---------------------------"
@@ -138,7 +138,7 @@ function apply() {
             terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR --terragrunt-working-dir $i -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out \
                 2>"$STEP_TMP_DIR/terraform_apply_error/${plan_name}.stderr" \
                 | $TFMASK \
-                | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply_stdout/${i}.stdout"
+                | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply_stdout/${plan_name}.stdout"
         fi
     done
     end_group
