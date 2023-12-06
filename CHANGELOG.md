@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.4](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.11.3...v1.11.4) (2023-12-06)
+
+
+### Bug Fixes
+
+* apply_all ([70a5d23](https://github.com/Fenikks/gh-actions-terragrunt/commit/70a5d2314c287527e256b985af137902c6e5cd56))
+
 ## [1.11.3](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.11.2...v1.11.3) (2023-12-06)
 
 
