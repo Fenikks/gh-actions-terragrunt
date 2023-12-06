@@ -57,7 +57,7 @@ else
 fi
 
 start_group "Content of terraform_apply.stderr"
-for file in $STEP_TMP_DIR/terraform_apply_error
+for file in $STEP_TMP_DIR/terraform_apply_error; do
     echo "Contetn of $file"
     cat $STEP_TMP_DIR/terraform_apply_error/$file
 done
@@ -68,7 +68,7 @@ end_group
 # end_group
 
 start_group "Content of terraform_apply.stdout"
-for file in $STEP_TMP_DIR/terraform_apply_stdout
+for file in $STEP_TMP_DIR/terraform_apply_stdout; do
     echo "Contetn of $file"
     cat $STEP_TMP_DIR/terraform_apply_stdout/$file
 done
