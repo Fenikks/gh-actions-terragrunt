@@ -57,7 +57,9 @@ else
 fi
 
 start_group "Content of terraform_apply.stderr"
+ls -l $STEP_TMP_DIR/terraform_apply_error
 for file in $STEP_TMP_DIR/terraform_apply_error; do
+    echo "file is  $file"
     echo "Contetn of $file"
     cat $STEP_TMP_DIR/terraform_apply_error/$file
 done
