@@ -61,7 +61,7 @@ ls -l $STEP_TMP_DIR/terraform_apply_error
 for file in $STEP_TMP_DIR/terraform_apply_error/*; do
     echo "file is  $file"
     echo "Contetn of $file"
-    cat $STEP_TMP_DIR/terraform_apply_error/$file
+    cat $file
 done
 end_group
 
@@ -70,9 +70,9 @@ end_group
 # end_group
 
 start_group "Content of terraform_apply.stdout"
-for file in $STEP_TMP_DIR/terraform_apply_stdout; do
+for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
     echo "Contetn of $file"
-    cat $STEP_TMP_DIR/terraform_apply_stdout/$file
+    cat $file
 done
 end_group
 
