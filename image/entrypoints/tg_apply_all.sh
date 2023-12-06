@@ -60,6 +60,7 @@ start_group "Content of terraform_apply.stderr"
 for file in $STEP_TMP_DIR/terraform_apply_error
     echo "Contetn of $file"
     cat $STEP_TMP_DIR/terraform_apply_error/$file
+done
 end_group
 
 # start_group "Content of terraform_apply.stderr"
@@ -70,6 +71,7 @@ start_group "Content of terraform_apply.stdout"
 for file in $STEP_TMP_DIR/terraform_apply_stdout
     echo "Contetn of $file"
     cat $STEP_TMP_DIR/terraform_apply_stdout/$file
+done
 end_group
 
 # start_group "Content of terraform_apply.stdout"
