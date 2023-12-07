@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.4](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.12.3...v1.12.4) (2023-12-07)
+
+
+### Bug Fixes
+
+* add aws state lock for test ([c3f8e5c](https://github.com/Fenikks/gh-actions-terragrunt/commit/c3f8e5c63430bef1d21ed24432b30dd35b421995))
+
 ## [1.12.3](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.12.2...v1.12.3) (2023-12-07)
 
 
