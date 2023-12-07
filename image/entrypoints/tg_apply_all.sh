@@ -77,7 +77,10 @@ end_group
 
 start_group "Apply stdout"
 for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
-    start_group "${file#$INPUT_PATH//___/\/}"
+    filename=$(basename "$file")
+    start_group "${filename#$INPUT_PATH//___/\/}"
+done
+for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
     cat $file
     end_group
 done
