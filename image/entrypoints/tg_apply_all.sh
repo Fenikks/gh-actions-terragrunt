@@ -39,14 +39,31 @@ cd /tmp
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
 unzip /tmp/awscliv2.zip -d /tmp > /dev/null
 /tmp/aws/install
-aws sts get-caller-identity
-set -e
+
+
 echo "--------------------------------------------"
 
 
 export AWS_REGION=us-east-1
 aws sts get-caller-identity
 aws dynamodb scan --table-name test-repo-state-lock-test-tg-gh-actions
+
+
+# normal
+aws dynamodb delete-item \
+--table-name test-repo-state-lock-test-tg-gh-actions \
+--key '{"LockID":{"S":"test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate-md5"}}'
+
+# lock
+aws dynamodb put-item \
+--table-name test-repo-state-lock-test-tg-gh-actions \
+--item '{
+  "LockID": {"S": "test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate"},
+  "Info": {"S": "Manually inserted test lock"} 
+}'
+
+
+set -e
 end_group
 
 
@@ -84,17 +101,17 @@ if [[ ! "$(ls $STEP_TMP_DIR/terraform_apply_error/*.stderr 2>/dev/null)" ]] && [
 fi
 
 
-echo "Apply errors by module"
+echo "Apply errors by module:"
 for file in $STEP_TMP_DIR/terraform_apply_error/*; do
     if [[ -s $file ]]; then
         filename=$(basename "$file")
-        start_group ":${filename//___/\/}"
+        start_group "${filename//___/\/}"
         cat $file
         end_group
     fi
 done
 
-start_group "Apply output by module"
+echo "Apply output by module:"
 for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
     if [[ -s $file ]]; then
         filename=$(basename "$file")
