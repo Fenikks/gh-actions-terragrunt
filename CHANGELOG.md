@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.12.0...v1.12.1) (2023-12-07)
+
+
+### Bug Fixes
+
+* apply logs in cycle ([877314c](https://github.com/Fenikks/gh-actions-terragrunt/commit/877314c99bc65bba33f2d993205beeed3b8a4a5d))
+
 ## [1.12.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.11.9...v1.12.0) (2023-12-07)
 
 
