@@ -83,43 +83,28 @@ if [[ ! "$(ls $STEP_TMP_DIR/terraform_apply_error/*.stderr 2>/dev/null)" ]] && [
     exit 0
 fi
 
-# start_group "Apply stderr"
-echo "::group::Apply stderr"
+
+echo "Apply errors by module"
 for file in $STEP_TMP_DIR/terraform_apply_error/*; do
-    filename=$(basename "$file")
-    # start_group "${file#$INPUT_PATH//___/\/}"
-    echo "::group::${filename//___/\/}"
-    cat $file
-    # end_group
-echo "::endgroup::"
+    if [[ -s $file ]]; then
+        filename=$(basename "$file")
+        start_group ":${filename//___/\/}"
+        cat $file
+        end_group
+    fi
 done
-# end_group
-echo "::endgroup::"
 
-# start_group "Content of terraform_apply.stderr"
-# cat $STEP_TMP_DIR/terraform_apply.stderr
-# end_group
-
-start_group "Apply stdout"
+start_group "Apply output by module"
 for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
-    filename=$(basename "$file")
-    # start_group "${filename#$INPUT_PATH//___/\/}"
-    echo "::group::${filename//___/\/}"
+    if [[ -s $file ]]; then
+        filename=$(basename "$file")
+        start_group "${filename//___/\/}"
+        cat $file
+        end_group
+    fi
 done
-for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
-    cat $file
-    # end_group
-    echo "::endgroup::"
-done
-# end_group
-echo "::endgroup::"
-
-# start_group "Content of terraform_apply.stdout"
-# cat $STEP_TMP_DIR/terraform_apply.stdout
-# end_group
 
 # check if there are errors in terraform_apply.stderr
-
 for file in $STEP_TMP_DIR/terraform_apply_error/*; do
     if lock-info "$file"; then
         update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
