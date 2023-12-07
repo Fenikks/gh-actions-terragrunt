@@ -30,6 +30,26 @@ if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
     exit 1
 fi
 
+
+
+start_group "TEMP test aws"
+echo "---------- DEBUG MESSAGE call aws cli ----------"
+set +e
+cd /tmp
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+unzip /tmp/awscliv2.zip -d /tmp > /dev/null
+/tmp/aws/install
+aws sts get-caller-identity
+set -e
+echo "--------------------------------------------"
+
+
+export AWS_REGION=us-east-1
+aws sts get-caller-identity
+aws dynamodb scan --table-name test-repo-state-lock-test-tg-gh-actions
+end_group
+
+
 ### Apply the plan
 
 if [[ "$INPUT_AUTO_APPROVE" == "true" ]]; then
@@ -63,13 +83,18 @@ if [[ ! "$(ls $STEP_TMP_DIR/terraform_apply_error/*.stderr 2>/dev/null)" ]] && [
     exit 0
 fi
 
-start_group "Apply stderr"
+# start_group "Apply stderr"
+echo "::group::Apply stderr"
 for file in $STEP_TMP_DIR/terraform_apply_error/*; do
-    start_group "${file#$INPUT_PATH//___/\/}"
+    filename=$(basename "$file")
+    # start_group "${file#$INPUT_PATH//___/\/}"
+    echo "::group::${filename//___/\/}"
     cat $file
-    end_group
+    # end_group
+echo "::endgroup::"
 done
-end_group
+# end_group
+echo "::endgroup::"
 
 # start_group "Content of terraform_apply.stderr"
 # cat $STEP_TMP_DIR/terraform_apply.stderr
@@ -78,13 +103,16 @@ end_group
 start_group "Apply stdout"
 for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
     filename=$(basename "$file")
-    start_group "${filename#$INPUT_PATH//___/\/}"
+    # start_group "${filename#$INPUT_PATH//___/\/}"
+    echo "::group::${filename//___/\/}"
 done
 for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
     cat $file
-    end_group
+    # end_group
+    echo "::endgroup::"
 done
-end_group
+# end_group
+echo "::endgroup::"
 
 # start_group "Content of terraform_apply.stdout"
 # cat $STEP_TMP_DIR/terraform_apply.stdout

@@ -125,27 +125,29 @@ function apply() {
     #     2>"$STEP_TMP_DIR/terraform_apply.stderr" \
     #     | $TFMASK \
     #     | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
-
-    for i in $MODULE_PATHS; do 
-        plan_name=${i//\//___}
-        echo "------ DEBUG MESSAGE ------"
-        cat $PLAN_OUT_DIR/$plan_name
-        echo "---------------------------"
-        if grep -q "No changes." $PLAN_OUT_DIR/$plan_name; then
-            echo "There is no changes in the module ${i#$INPUT_PATH}, skiping plan apply for it"
-            echo
-            continue
-        else
+    (
+        for i in $MODULE_PATHS; do 
+            plan_name=${i//\//___}
             echo "------ DEBUG MESSAGE ------"
-            echo "Applying plan ${i#$INPUT_PATH}"
+            cat $PLAN_OUT_DIR/$plan_name
             echo "---------------------------"
+            if grep -q "No changes." $PLAN_OUT_DIR/$plan_name; then
+                echo "There is no changes in the module ${i#$INPUT_PATH}, skiping plan apply for it"
+                echo
+                continue
+            else
+                echo "------ DEBUG MESSAGE ------"
+                echo "Applying plan ${i#$INPUT_PATH}"
+                echo "---------------------------"
 
-            (cd $i && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
-                2>"$STEP_TMP_DIR/terraform_apply_error/${plan_name}.stderr" \
-                | $TFMASK \
-                | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply_stdout/${plan_name}.stdout"
-        fi
-    done
+                (cd $i && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
+                    2>"$STEP_TMP_DIR/terraform_apply_error/${plan_name}.stderr" \
+                    | $TFMASK \
+                    | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply_stdout/${plan_name}.stdout"
+            fi
+        done
+        wait
+    )
     end_group
     set -e
 }
