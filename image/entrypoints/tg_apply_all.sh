@@ -56,12 +56,18 @@ else
     fi
 fi
 
-start_group "Content of terraform_apply.stderr"
-ls -l $STEP_TMP_DIR/terraform_apply_error
+# If there is no files in terraform_apply_error and in terraform_apply_stdout, then there is no changes in the plan
+if [[ ! "$(ls $STEP_TMP_DIR/terraform_apply_error/*.stderr 2>/dev/null)" ]] && [[ ! "$(ls $STEP_TMP_DIR/terraform_apply_error/*.stdout 2>/dev/null)" ]]; then
+    echo "No changes in the plan, skipping apply"
+    update_status ":white_check_mark: Plan applied in $(job_markdown_ref)"
+    exit 0
+fi
+
+start_group "Apply stderr"
 for file in $STEP_TMP_DIR/terraform_apply_error/*; do
-    echo "file is  $file"
-    echo "Contetn of $file"
+    start_group "${file#$INPUT_PATH//___/\/}"
     cat $file
+    end_group
 done
 end_group
 
@@ -69,10 +75,11 @@ end_group
 # cat $STEP_TMP_DIR/terraform_apply.stderr
 # end_group
 
-start_group "Content of terraform_apply.stdout"
+start_group "Apply stdout"
 for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
-    echo "Contetn of $file"
+    start_group "${file#$INPUT_PATH//___/\/}"
     cat $file
+    end_group
 done
 end_group
 
@@ -82,6 +89,19 @@ end_group
 
 # check if there are errors in terraform_apply.stderr
 
+for file in $STEP_TMP_DIR/terraform_apply_error/*; do
+    if lock-info "$file"; then
+        update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
+        exit 1
+    else
+        for code in $(tac $file | awk '/^[[:space:]]*\*/{flag=1; print} flag && /^[[:space:]]*time=/{exit}' | awk '{print $5}'); do
+            if [[ $code -eq 1 ]]; then
+                update_status ":x: Error applying plan in $(job_markdown_ref)"
+                exit 1
+            fi
+        done
+    fi
+done
 
 # if lock-info "$STEP_TMP_DIR/terraform_apply.stderr"; then
 #     update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"

@@ -80,16 +80,28 @@ function plan() {
     # shellcheck disable=SC2086
     debug_log terragrunt run-all plan --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
     
+    # Get a list of all modules in the provided path
     MODULE_PATHS=$(terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]')
+    export MODULE_PATHS
 
+    start_group "List of modules found in the provided input path"
+    for p in $MODULE_PATHS; do
+        echo "- ${p#$INPUT_PATH}"
+    done
+    end_group
+    
     set +e
     # shellcheck disable=SC2086
     start_group "Generating plan"
-    (cd "$INPUT_PATH" && terragrunt run-all plan --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
-        2>"$STEP_TMP_DIR/terraform_plan.stderr" \
-        | $TFMASK 
+    (
+        (cd "$INPUT_PATH" && terragrunt run-all plan --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
+            2>"$STEP_TMP_DIR/terraform_plan.stderr" \
+            | $TFMASK 
+        wait
+    )
     end_group
 
+    # Generate text file for each plan
     start_group "Generating plan it text format"
     # shellcheck disable=SC2034
     for i in $MODULE_PATHS; do 
@@ -99,15 +111,9 @@ function plan() {
     done
     end_group
     set -e
-
-    export MODULE_PATHS
 }
 
 function apply() {
-    
-    echo "------ DEBUG MESSAGE ------"
-    echo "MODULE_PATHS $MODULE_PATHS"
-    echo "---------------------------"
 
     # shellcheck disable=SC2086
     debug_log terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS' plan.out
@@ -126,16 +132,15 @@ function apply() {
         cat $PLAN_OUT_DIR/$plan_name
         echo "---------------------------"
         if grep -q "No changes." $PLAN_OUT_DIR/$plan_name; then
-            echo "------ DEBUG MESSAGE ------"
-            echo "No changes in this module, skiping"
-            echo "---------------------------"
+            echo "There is no changes in the module ${i#$INPUT_PATH}, skiping plan apply for it"
+            echo
             continue
         else
             echo "------ DEBUG MESSAGE ------"
-            echo "Applying plan"
+            echo "Applying plan ${i#$INPUT_PATH}"
             echo "---------------------------"
 
-            terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR --terragrunt-working-dir $i -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out \
+            (cd $i && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
                 2>"$STEP_TMP_DIR/terraform_apply_error/${plan_name}.stderr" \
                 | $TFMASK \
                 | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply_stdout/${plan_name}.stdout"
