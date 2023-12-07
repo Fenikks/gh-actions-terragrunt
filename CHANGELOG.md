@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.11.9...v1.12.0) (2023-12-07)
+
+
+### Features
+
+* apply in cycle ([1bd5019](https://github.com/Fenikks/gh-actions-terragrunt/commit/1bd501999b09a8f2762d46cceaabd4b0e4945c6b))
+
 ## [1.11.9](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.11.8...v1.11.9) (2023-12-06)
 
 
