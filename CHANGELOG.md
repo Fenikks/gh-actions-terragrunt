@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.5](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.4...v1.13.5) (2023-12-08)
+
+
+### Bug Fixes
+
+* test plan lock ([52263d8](https://github.com/Fenikks/gh-actions-terragrunt/commit/52263d85aa2fe268f90bfec1c46e38a160a4b067))
+
 ## [1.13.4](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.3...v1.13.4) (2023-12-08)
 
 
