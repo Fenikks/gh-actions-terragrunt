@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.0...v1.13.1) (2023-12-08)
+
+
+### Bug Fixes
+
+* module path in logs ([f389dfc](https://github.com/Fenikks/gh-actions-terragrunt/commit/f389dfc59967d705ce8e9d01f076190b91f5a0db))
+
 ## [1.13.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.12.4...v1.13.0) (2023-12-08)
 
 
