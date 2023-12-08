@@ -50,11 +50,12 @@ function setup() {
         TF_VERSION=$INPUT_TF_VERSION
     fi
     
-    curl -L -o /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64"
+    curl -Lo /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64"
     chmod +x /usr/local/bin/terragrunt
     curl -o /tmp/terraform_${TF_VERSION}_linux_amd64.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
     unzip /tmp/terraform_${TF_VERSION}_linux_amd64.zip -d /usr/local/bin/
     chmod +x /usr/local/bin/terraform
+
     end_group
 
     detect_tfmask
@@ -77,6 +78,7 @@ function set_common_plan_args() {
 }
 
 function plan() {
+
     # shellcheck disable=SC2086
     debug_log terragrunt run-all plan --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
     
@@ -120,11 +122,6 @@ function apply() {
 
     set +e
     start_group "Applying plan"
-    # shellcheck disable=SC2086
-    # (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
-    #     2>"$STEP_TMP_DIR/terraform_apply.stderr" \
-    #     | $TFMASK \
-    #     | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
     (
         for i in $MODULE_PATHS; do 
             plan_name=${i//\//___}
@@ -148,6 +145,22 @@ function apply() {
         done
         wait
     )
+    end_group
+    set -e
+}
+
+function apply_all() {
+    
+    # shellcheck disable=SC2086
+    debug_log terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS' plan.out
+
+    set +e
+    start_group "Applying plan"
+    # shellcheck disable=SC2086
+    (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
+        2>"$STEP_TMP_DIR/terraform_apply.stderr" \
+        | $TFMASK \
+        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
     end_group
     set -e
 }
