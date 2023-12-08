@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.13.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.12.4...v1.13.0) (2023-12-08)
+
+
+### Features
+
+* added apply strategy ([df02b29](https://github.com/Fenikks/gh-actions-terragrunt/commit/df02b29085c575474c328c9beb6ad01d27e4ada2))
+* added apply strategy ([bf80d7e](https://github.com/Fenikks/gh-actions-terragrunt/commit/bf80d7ea638ca5cbfe04e9579d048869a29cee43))
+
 ## [1.12.4](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.12.3...v1.12.4) (2023-12-07)
 
 
