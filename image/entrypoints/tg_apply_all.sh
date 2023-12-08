@@ -64,7 +64,11 @@ fi
 # end_group
 
 
-### Apply the plan
+# Apply the plan
+
+echo "---------------------- DEBUG MESSAGE ----------------------"
+echo $INPUT_STRATEGY
+echo "-----------------------------------------------------------"
 
 if [[ "$INPUT_AUTO_APPROVE" == "true" ]]; then
     echo "Automatically approving plan"
