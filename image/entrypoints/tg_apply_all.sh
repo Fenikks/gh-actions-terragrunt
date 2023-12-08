@@ -26,7 +26,7 @@ end_group
 
 # Check if state is locked
 if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
-    update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
+    update_status ":x: Error applying plan in $(job_markdown_ref) (State is locked)"
     exit 1
 fi
 
@@ -110,7 +110,7 @@ if [[ "$INPUT_STRATEGY" == "parallel" ]]; then
 
     # check if there are errors in terraform_apply.stderr
     if lock-info "$STEP_TMP_DIR/terraform_apply.stderr"; then
-        update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
+        update_status ":x: Error applying plan in $(job_markdown_ref) (State is locked)"
         exit 1
     else
         for code in $(tac $STEP_TMP_DIR/terraform_apply.stderr | awk '/^[[:space:]]*\*/{flag=1; print} flag && /^[[:space:]]*time=/{exit}' | awk '{print $5}'); do
@@ -154,7 +154,7 @@ else
     # check if there are errors in terraform_apply.stderr
     for file in $STEP_TMP_DIR/terraform_apply_error/*; do
         if lock-info "$file"; then
-            update_status ":x: Error applying plan in $(job_markdown_ref)(State is locked)"
+            update_status ":x: Error applying plan in $(job_markdown_ref) (State is locked)"
             exit 1
         else
             for code in $(tac $file | awk '/^[[:space:]]*\*/{flag=1; print} flag && /^[[:space:]]*time=/{exit}' | awk '{print $5}'); do

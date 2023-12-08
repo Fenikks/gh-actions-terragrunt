@@ -33,7 +33,7 @@ if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "issue_c
 
         # Check if state is locked  
         if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
-            STATUS=":x: Failed to generate plan in $(job_markdown_ref)(State is locked)" github_pr_comment plan
+            STATUS=":x: Failed to generate plan in $(job_markdown_ref) (State is locked)" github_pr_comment plan
             exit 1
         fi
 
