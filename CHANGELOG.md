@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.13.7](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.6...v1.13.7) (2023-12-08)
+
+
+### Bug Fixes
+
+* labeler ([a03b9b7](https://github.com/Fenikks/gh-actions-terragrunt/commit/a03b9b7a52653ea59b0b5591bf6089b240c070b9))
+* labeler ([24f2d69](https://github.com/Fenikks/gh-actions-terragrunt/commit/24f2d698c1e13f72e3e1d959234398defb37bac3))
+* labeler ([af30263](https://github.com/Fenikks/gh-actions-terragrunt/commit/af302632e014be53707a9db1baf2442a9c5c727a))
+
 ## [1.13.6](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.5...v1.13.6) (2023-12-08)
 
 
