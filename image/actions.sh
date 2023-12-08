@@ -117,29 +117,18 @@ function plan() {
 
 function apply() {
 
-    echo "---------------------- DEBUG MESSAGE ----------------------"
-    echo Running apply sequential
-    echo "-----------------------------------------------------------"
     # shellcheck disable=SC2086
     debug_log terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS' plan.out
 
     set +e
-    start_group "Applying plan"
+    start_group "Applying plan sequentially"
     (
         for i in $MODULE_PATHS; do 
             plan_name=${i//\//___}
-            echo "---------------------- DEBUG MESSAGE ----------------------"
-            cat $PLAN_OUT_DIR/$plan_name
-            echo "-----------------------------------------------------------"
             if grep -q "No changes." $PLAN_OUT_DIR/$plan_name; then
                 echo "There is no changes in the module ${INPUT_PATH}${i#*${INPUT_PATH#./}}, skiping plan apply for it"
-                echo
                 continue
             else
-                echo "---------------------- DEBUG MESSAGE ----------------------"
-                echo "Applying plan ${INPUT_PATH}${i#*${INPUT_PATH#./}}"
-                echo "-----------------------------------------------------------"
-
                 (cd $i && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
                     2>"$STEP_TMP_DIR/terraform_apply_error/${plan_name}.stderr" \
                     | $TFMASK \
@@ -153,16 +142,12 @@ function apply() {
 }
 
 function apply_all() {
-    
-    echo "---------------------- DEBUG MESSAGE ----------------------"
-    echo Running apply parallel
-    echo "-----------------------------------------------------------"
 
     # shellcheck disable=SC2086
     debug_log terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS' plan.out
 
     set +e
-    start_group "Applying plan"
+    start_group "Applying plan parallel"
     # shellcheck disable=SC2086
     (
         (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \

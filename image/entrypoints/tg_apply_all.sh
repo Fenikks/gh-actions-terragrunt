@@ -31,44 +31,7 @@ if lock-info "$STEP_TMP_DIR/terraform_plan.stderr"; then
 fi
 
 
-
-start_group "TEMP test aws"
-echo "---------- DEBUG MESSAGE call aws cli ----------"
-set +e
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
-unzip /tmp/awscliv2.zip -d /tmp > /dev/null
-/tmp/aws/install
-
-
-echo "--------------------------------------------"
-
-export AWS_REGION=us-east-1
-aws sts get-caller-identity
-aws dynamodb scan --table-name test-repo-state-lock-test-tg-gh-actions
-
-# normal
-aws dynamodb delete-item \
---table-name test-repo-state-lock-test-tg-gh-actions \
---key '{"LockID":{"S":"test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate-md5"}}'
-
-# lock
-aws dynamodb put-item \
---table-name test-repo-state-lock-test-tg-gh-actions \
---item '{
-  "LockID": {"S": "test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate"},
-  "Info": {"S": "Manually inserted test lock"} 
-}'
-
-set -e
-end_group
-
-
 # Apply the plan
-
-echo "---------------------- DEBUG MESSAGE ----------------------"
-echo $INPUT_STRATEGY
-echo "-----------------------------------------------------------"
-
 if [[ "$INPUT_AUTO_APPROVE" == "true" ]]; then
     echo "Automatically approving plan"
     if [[ "$INPUT_STRATEGY" == "parallel" ]]; then
@@ -104,11 +67,11 @@ fi
 
 if [[ "$INPUT_STRATEGY" == "parallel" ]]; then
     start_group "Content of terraform_apply.stderr"
-    cat "$STEP_TMP_DIR/terraform_apply.stderr"
+    cat >&2 "$STEP_TMP_DIR/terraform_apply.stderr"
     end_group
 
     start_group "Content of terraform_apply.stdout"
-    cat "$STEP_TMP_DIR/terraform_apply.stdout"
+    cat >&2 "$STEP_TMP_DIR/terraform_apply.stdout"
     end_group
 
     # check if there are errors in terraform_apply.stderr
