@@ -32,36 +32,36 @@ fi
 
 
 
-# start_group "TEMP test aws"
-# echo "---------- DEBUG MESSAGE call aws cli ----------"
-# set +e
-# cd /tmp
-# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
-# unzip /tmp/awscliv2.zip -d /tmp > /dev/null
-# /tmp/aws/install
+start_group "TEMP test aws"
+echo "---------- DEBUG MESSAGE call aws cli ----------"
+set +e
+cd /tmp
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+unzip /tmp/awscliv2.zip -d /tmp > /dev/null
+/tmp/aws/install
 
 
-# echo "--------------------------------------------"
+echo "--------------------------------------------"
 
-# export AWS_REGION=us-east-1
-# aws sts get-caller-identity
-# aws dynamodb scan --table-name test-repo-state-lock-test-tg-gh-actions
+export AWS_REGION=us-east-1
+aws sts get-caller-identity
+aws dynamodb scan --table-name test-repo-state-lock-test-tg-gh-actions
 
-# # normal
-# aws dynamodb delete-item \
-# --table-name test-repo-state-lock-test-tg-gh-actions \
-# --key '{"LockID":{"S":"test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate-md5"}}'
+# normal
+aws dynamodb delete-item \
+--table-name test-repo-state-lock-test-tg-gh-actions \
+--key '{"LockID":{"S":"test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate-md5"}}'
 
-# # lock
-# aws dynamodb put-item \
-# --table-name test-repo-state-lock-test-tg-gh-actions \
-# --item '{
-#   "LockID": {"S": "test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate"},
-#   "Info": {"S": "Manually inserted test lock"} 
-# }'
+# lock
+aws dynamodb put-item \
+--table-name test-repo-state-lock-test-tg-gh-actions \
+--item '{
+  "LockID": {"S": "test-repo-state-test-tg-gh-actions/dev/app/mod1.terraform.tfstate"},
+  "Info": {"S": "Manually inserted test lock"} 
+}'
 
-# set -e
-# end_group
+set -e
+end_group
 
 
 # Apply the plan
