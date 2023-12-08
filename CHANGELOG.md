@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.6](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.5...v1.13.6) (2023-12-08)
+
+
+### Bug Fixes
+
+* remove tests and debug ([8dc628f](https://github.com/Fenikks/gh-actions-terragrunt/commit/8dc628fb1075bf6e9933db9b0f1ac2443a2e7886))
+
 ## [1.13.5](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.4...v1.13.5) (2023-12-08)
 
 
