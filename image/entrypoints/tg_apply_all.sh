@@ -133,7 +133,8 @@ else
     for file in $STEP_TMP_DIR/terraform_apply_error/*; do
         if [[ -s $file ]]; then
             filename=$(basename "$file")
-            start_group "${filename//___/\/}"
+            filename=${filename//___/\/}
+            start_group "${INPUT_PATH}${filename#*${INPUT_PATH#./}}"
             cat $file
             end_group
         fi
@@ -143,7 +144,8 @@ else
     for file in $STEP_TMP_DIR/terraform_apply_stdout/*; do
         if [[ -s $file ]]; then
             filename=$(basename "$file")
-            start_group "${filename//___/\/}"
+            filename=${filename//___/\/}
+            start_group "${INPUT_PATH}${filename#*${INPUT_PATH#./}}"
             cat $file
             end_group
         fi

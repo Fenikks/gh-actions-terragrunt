@@ -88,7 +88,7 @@ function plan() {
 
     start_group "List of modules found in the provided input path"
     for p in $MODULE_PATHS; do
-        echo "- ${p#$INPUT_PATH}"
+        echo "- ${INPUT_PATH}${p#*${INPUT_PATH#./}}"
     done
     end_group
     
@@ -117,6 +117,9 @@ function plan() {
 
 function apply() {
 
+    echo "---------------------- DEBUG MESSAGE ----------------------"
+    echo Running apply sequential
+    echo "-----------------------------------------------------------"
     # shellcheck disable=SC2086
     debug_log terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS' plan.out
 
@@ -125,17 +128,17 @@ function apply() {
     (
         for i in $MODULE_PATHS; do 
             plan_name=${i//\//___}
-            echo "------ DEBUG MESSAGE ------"
+            echo "---------------------- DEBUG MESSAGE ----------------------"
             cat $PLAN_OUT_DIR/$plan_name
-            echo "---------------------------"
+            echo "-----------------------------------------------------------"
             if grep -q "No changes." $PLAN_OUT_DIR/$plan_name; then
-                echo "There is no changes in the module ${i#$INPUT_PATH}, skiping plan apply for it"
+                echo "There is no changes in the module ${INPUT_PATH}${i#*${INPUT_PATH#./}}, skiping plan apply for it"
                 echo
                 continue
             else
-                echo "------ DEBUG MESSAGE ------"
-                echo "Applying plan ${i#$INPUT_PATH}"
-                echo "---------------------------"
+                echo "---------------------- DEBUG MESSAGE ----------------------"
+                echo "Applying plan ${INPUT_PATH}${i#*${INPUT_PATH#./}}"
+                echo "-----------------------------------------------------------"
 
                 (cd $i && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
                     2>"$STEP_TMP_DIR/terraform_apply_error/${plan_name}.stderr" \
@@ -151,6 +154,10 @@ function apply() {
 
 function apply_all() {
     
+    echo "---------------------- DEBUG MESSAGE ----------------------"
+    echo Running apply parallel
+    echo "-----------------------------------------------------------"
+
     # shellcheck disable=SC2086
     debug_log terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG '$PLAN_ARGS' plan.out
 
