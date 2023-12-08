@@ -164,10 +164,13 @@ function apply_all() {
     set +e
     start_group "Applying plan"
     # shellcheck disable=SC2086
-    (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
-        2>"$STEP_TMP_DIR/terraform_apply.stderr" \
-        | $TFMASK \
-        | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
+    (
+        (cd "$INPUT_PATH" && terragrunt run-all apply --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -auto-approve -lock-timeout=300s $PARALLEL_ARG $PLAN_ARGS plan.out) \
+            2>"$STEP_TMP_DIR/terraform_apply.stderr" \
+            | $TFMASK \
+            | tee /dev/fd/3 "$STEP_TMP_DIR/terraform_apply.stdout"
+        wait
+    )
     end_group
     set -e
 }
