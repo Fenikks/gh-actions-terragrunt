@@ -31,6 +31,22 @@ inputs:
     description: Create a plan to destroy all resources
     required: false
     default: "false"
+  create_cache_folder_in_workspace:
+    description: "Create a cache folder in the workspace"
+    required: false
+    default: "false"
+  cache_folder:
+    description: "Cache folder name"
+    required: false
+    default: ".terragrunt-cache"
+  tf_plugin_cache_folder:
+    description: "Cache folder name for Terraform plugins"
+    required: false
+    default: "tf-plugin-cache"
+  tg_cache_folder:
+    description: "Cache folder name for Terragrunt"
+    required: false
+    default: "tg-cache"
 
 runs:
   using: docker
