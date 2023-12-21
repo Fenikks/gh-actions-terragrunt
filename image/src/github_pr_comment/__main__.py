@@ -1,6 +1,5 @@
 import hashlib
 import os
-import subprocess
 import re
 import sys
 from pathlib import Path
@@ -15,14 +14,8 @@ from github_actions.debug import debug
 from github_actions.env import GithubEnv
 from github_actions.find_pr import find_pr, WorkflowException
 from github_actions.inputs import PlanPrInputs
-from github_pr_comment.backend_config import complete_config, partial_config
-from github_pr_comment.backend_fingerprint import fingerprint
-from github_pr_comment.cmp import plan_cmp, remove_warnings, remove_unchanged_attributes
 from github_pr_comment.comment import find_comment, TerraformComment, update_comment, serialize, deserialize
-from github_pr_comment.hash import comment_hash, plan_hash
-from plan_renderer.variables import render_argument_list, Sensitive
-from terraform.module import load_module, get_sensitive_variables
-from terraform import hcl
+from github_pr_comment.hash import plan_hash
 
 Plan = NewType('Plan', str)
 Status = NewType('Status', str)
@@ -65,14 +58,14 @@ def _mask_backend_config(action_inputs: PlanPrInputs) -> Optional[str]:
 
     clean = []
 
-    for field in action_inputs.get('INPUT_BACKEND_CONFIG', '').split(','):
-        if not field:
-            continue
+    # for field in action_inputs.get('INPUT_BACKEND_CONFIG', '').split(','):
+    #     if not field:
+    #         continue
 
-        if not any(bad_word in field for bad_word in bad_words):
-            clean.append(field)
+    #     if not any(bad_word in field for bad_word in bad_words):
+    #         clean.append(field)
 
-    return ','.join(clean)
+    # return ','.join(clean)
 
 
 def format_classic_description(action_inputs: PlanPrInputs) -> str:
