@@ -58,15 +58,6 @@ function setup() {
 
     end_group
 
-    if [[ "$INPUT_CREATE_CACHE_FOLDER_IN_WORKSPACE" == "true" ]]; then
-        CACHE_PATH=${GITHUB_WORKSPACE}
-    else
-        CACHE_PATH="/tmp"
-    fi
-    
-    export TF_IN_AUTOMATION=true
-    export CACHE_PATH
-
     detect_tfmask
 }
 
@@ -223,6 +214,14 @@ function fix_owners() {
         debug_cmd find "$INPUT_PATH" -regex '.*/zzzz-gh-actions-terragrunt-[0-9]+\.auto\.tfvars' -print -delete || true
     fi
 }
+
+export TF_IN_AUTOMATION=true
+
+if [[ "$INPUT_CREATE_CACHE_FOLDER_IN_WORKSPACE" == "true" ]]; then
+    CACHE_PATH=${GITHUB_WORKSPACE}
+else
+    CACHE_PATH="/tmp"
+fi
 
 # Every file written to disk should use one of these directories
 STEP_TMP_DIR="/tmp"
