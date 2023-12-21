@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.7...v1.14.0) (2023-12-21)
+
+
+### Features
+
+* added cache folder ([5b58b1b](https://github.com/Fenikks/gh-actions-terragrunt/commit/5b58b1ba4674fc03a85b409992ef87281ad253dc))
+* added cache folder ([18fb3cd](https://github.com/Fenikks/gh-actions-terragrunt/commit/18fb3cd846c38a83a77ab98b49a16664a1df00e5))
+
 ## [1.13.7](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.13.6...v1.13.7) (2023-12-08)
 
 
