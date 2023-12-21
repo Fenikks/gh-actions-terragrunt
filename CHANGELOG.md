@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.14.1...v1.14.2) (2023-12-21)
+
+
+### Bug Fixes
+
+* add action inputs ([500d07d](https://github.com/Fenikks/gh-actions-terragrunt/commit/500d07d079b7ba14f83f0e38234be5e5b4f21470))
+
 ## [1.14.1](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.14.0...v1.14.1) (2023-12-21)
 
 
