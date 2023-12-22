@@ -199,6 +199,10 @@ function fix_owners() {
         chown -R --reference "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/.gh-actions-terragrunt" || true
         debug_cmd ls -la "$GITHUB_WORKSPACE/.gh-actions-terragrunt"
     fi
+    if [[ -d "$GITHUB_WORKSPACE/$INPUT_CACHE_FOLDER" ]]; then
+        chown -R --reference "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/$INPUT_CACHE_FOLDER" || true
+        debug_cmd ls -la "$GITHUB_WORKSPACE/$INPUT_CACHE_FOLDER"
+    fi
 
     debug_cmd ls -la "$HOME"
     if [[ -d "$HOME/.gh-actions-terragrunt" ]]; then
