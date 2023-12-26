@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.4](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.14.3...v1.14.4) (2023-12-26)
+
+
+### Bug Fixes
+
+* deleted empty lines, extra spaces ([30a97f8](https://github.com/Fenikks/gh-actions-terragrunt/commit/30a97f89afb2e1de729a9160c9851cd701b4e847))
+* deleted empty lines, extra spaces ([6081052](https://github.com/Fenikks/gh-actions-terragrunt/commit/6081052990f417064c1d71f7f80933414c337377))
+
 ## [1.14.3](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.14.2...v1.14.3) (2023-12-22)
 
 
