@@ -1,7 +1,7 @@
 ---
-name: 📦 Create release dev
-# https://github.com/google-github-actions/release-please-action#release-types-supported
 
+# https://github.com/google-github-actions/release-please-action#release-types-supported
+name: 📦 Create release
 
 on:  # yamllint disable-line rule:truthy
   push:
@@ -40,4 +40,5 @@ jobs:
               { "type": "build", "section": "Build System", "hidden": true },
               { "type": "ci", "section": "Continuous Integration", "hidden": true }
             ]
+
 ...

@@ -12,7 +12,6 @@ exec 3>&1
 ### Generate a plan
 plan
 
-
 start_group "Content of terraform_plan.stderr"
 cat >&2 "$STEP_TMP_DIR/terraform_plan.stderr"
 end_group

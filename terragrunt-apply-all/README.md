@@ -8,8 +8,8 @@ If the plan is not found or has changed, then the apply action will fail. This i
 
 You can instead set `auto_approve: true` which will generate a plan and apply it immediately, without looking for a plan attached to a PR.
 
->**NOTE:** 
->There are two apply strategies. Read about them bellow in Inputs section. 
+>**NOTE:**
+>There are two apply strategies. Read about them bellow in Inputs section.
 
 This github action uses --terragrunt-download-dir option to redirect cache in `/tmp/tg_cache_dir`.
 
@@ -80,11 +80,11 @@ These input values must be the same as any Fenikks/terragrunt-plan-all for the s
   - Default: false
 
 * `strategy`
-  
+
   When set to **parallel**(default) `terragrunt run-all apply` will be executed in provided `path`. And terragrunt will execute multiple plans in parallel accordint to parallelism settings. Plan will be applied even if there is no changes for particular module.
-  
+
   When set to **sequential** terragrunt will change into each module directory individually and execute `terragrunt run-all apply` and only when there are changes in the plan. So it will skip modules without changes and apply changes one by one.
- 
+
   - Type: string
   - Optional
   - Default: parallel

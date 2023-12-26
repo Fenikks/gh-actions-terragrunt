@@ -50,7 +50,7 @@ function setup() {
         TF_VERSION=$INPUT_TF_VERSION
     fi
     
-    curl -Lo /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64"
+    curl -Lo /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64"
     chmod +x /usr/local/bin/terragrunt
     curl -o /tmp/terraform_${TF_VERSION}_linux_amd64.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
     unzip /tmp/terraform_${TF_VERSION}_linux_amd64.zip -d /usr/local/bin/
@@ -82,7 +82,7 @@ function plan() {
 
     # shellcheck disable=SC2086
     debug_log terragrunt run-all plan --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out '$PLAN_ARGS'  # don't expand PLAN_ARGS
-    
+
     # Get a list of all modules in the provided path
     MODULE_PATHS=$(terragrunt output-module-groups --terragrunt-working-dir $INPUT_PATH|jq -r 'to_entries | .[].value[]')
     export MODULE_PATHS
@@ -92,14 +92,14 @@ function plan() {
         echo "- ${INPUT_PATH}${p#*${INPUT_PATH#./}}"
     done
     end_group
-    
+
     set +e
     # shellcheck disable=SC2086
     start_group "Generating plan"
     (
         (cd "$INPUT_PATH" && terragrunt run-all plan --terragrunt-download-dir $TG_CACHE_DIR -input=false -no-color -detailed-exitcode -lock-timeout=300s $PARALLEL_ARG -out=plan.out $PLAN_ARGS) \
             2>"$STEP_TMP_DIR/terraform_plan.stderr" \
-            | $TFMASK 
+            | $TFMASK
         wait
     )
     end_group
@@ -107,7 +107,7 @@ function plan() {
     # Generate text file for each plan
     start_group "Generating plan it text format"
     # shellcheck disable=SC2034
-    for i in $MODULE_PATHS; do 
+    for i in $MODULE_PATHS; do
         plan_name=${i//\//___}
         terragrunt show plan.out --terragrunt-working-dir $i -no-color --terragrunt-download-dir $TG_CACHE_DIR 2>"$STEP_TMP_DIR/terraform_show_plan.stderr" \
             |tee $PLAN_OUT_DIR/$plan_name
@@ -124,7 +124,7 @@ function apply() {
     set +e
     start_group "Applying plan sequentially"
     (
-        for i in $MODULE_PATHS; do 
+        for i in $MODULE_PATHS; do
             plan_name=${i//\//___}
             if grep -q "No changes." $PLAN_OUT_DIR/$plan_name; then
                 echo "There is no changes in the module ${INPUT_PATH}${i#*${INPUT_PATH#./}}, skiping plan apply for it"
@@ -241,9 +241,9 @@ mkdir -p $STEP_TMP_DIR/terraform_apply_error
 readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR TF_PLUGIN_CACHE_DIR
 export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR TF_PLUGIN_CACHE_DIR
 
-trap fix_owners EXIT
-
 echo "-------------------- DEBUG --------------------"
 echo "TG_CACHE_DIR is $TG_CACHE_DIR"
 echo "TF_PLUGIN_CACHE_DIR is $TF_PLUGIN_CACHE_DIR"
 echo "-----------------------------------------------"
+
+trap fix_owners EXIT
