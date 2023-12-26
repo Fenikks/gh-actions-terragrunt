@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.3](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.14.2...v1.14.3) (2023-12-22)
+
+
+### Bug Fixes
+
+* cache foler owner ([6b50ca9](https://github.com/Fenikks/gh-actions-terragrunt/commit/6b50ca96e06ff9eb191a6dd01e3219e61d8a3784))
+
 ## [1.14.2](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.14.1...v1.14.2) (2023-12-21)
 
 
