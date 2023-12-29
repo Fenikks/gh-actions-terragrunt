@@ -43,8 +43,12 @@ inputs:
     description: "Cache folder name"
     required: false
     default: ".terragrunt-cache"
+  use_tf_plugin_cache_folder:
+    description: "If set to true, the variable TF_PLUGIN_CACHE_DIR will be enabled"
+    required: false
+    default: "false"
   tf_plugin_cache_folder:
-    description: "Cache folder name for Terraform plugins"
+    description: "Cache folder name for Terraform plugins. Only applicable if use_tf_plugin_cache_folder is set to true"
     required: false
     default: "tf-plugin-cache"
   tg_cache_folder:

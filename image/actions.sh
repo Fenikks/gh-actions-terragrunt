@@ -227,23 +227,30 @@ else
     CACHE_PATH="/tmp"
 fi
 
-# Every file written to disk should use one of these directories
+if [[ "$INPUT_USE_TF_PLUGIN_CACHE_FOLDER" == "true" ]]; then
+    TF_PLUGIN_CACHE_DIR="${CACHE_PATH}/${INPUT_CACHE_FOLDER}/${INPUT_TF_PLUGIN_CACHE_FOLDER}"
+    mkdir -p $TF_PLUGIN_CACHE_DIR
+    readonly TF_PLUGIN_CACHE_DIR
+    export TF_PLUGIN_CACHE_DIR
+fi
+
 STEP_TMP_DIR="/tmp"
 PLAN_OUT_DIR="/tmp/plan"
 TG_CACHE_DIR="${CACHE_PATH}/${INPUT_CACHE_FOLDER}/${INPUT_TG_CACHE_FOLDER}"
-TF_PLUGIN_CACHE_DIR="${CACHE_PATH}/${INPUT_CACHE_FOLDER}/${INPUT_TF_PLUGIN_CACHE_FOLDER}"
+
 JOB_TMP_DIR="$HOME/.gh-actions-terragrunt"
 WORKSPACE_TMP_DIR=".gh-actions-terragrunt/$(random_string)"
-
-mkdir -p $PLAN_OUT_DIR $TG_CACHE_DIR $TF_PLUGIN_CACHE_DIR
+mkdir -p $PLAN_OUT_DIR $TG_CACHE_DIR
 mkdir -p $STEP_TMP_DIR/terraform_apply_stdout
 mkdir -p $STEP_TMP_DIR/terraform_apply_error
-readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR TF_PLUGIN_CACHE_DIR
-export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR TF_PLUGIN_CACHE_DIR
+readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR
+export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR
 
 echo "-------------------- DEBUG --------------------"
 echo "TG_CACHE_DIR is $TG_CACHE_DIR"
 echo "TF_PLUGIN_CACHE_DIR is $TF_PLUGIN_CACHE_DIR"
+echo "INPUT_USE_TF_PLUGIN_CACHE_FOLDER is $INPUT_USE_TF_PLUGIN_CACHE_FOLDER"
+echo "TF_IN_AUTOMATION is  $TF_IN_AUTOMATION"
 echo "-----------------------------------------------"
 
 trap fix_owners EXIT
