@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.14.4...v1.15.0) (2023-12-29)
+
+
+### Features
+
+* added imput option use_tf_plugin_cache_folder ([3a34d8b](https://github.com/Fenikks/gh-actions-terragrunt/commit/3a34d8b72a443d72e4316c21eafd302e328cc3a2))
+
 ## [1.14.4](https://github.com/Fenikks/gh-actions-terragrunt/compare/v1.14.3...v1.14.4) (2023-12-26)
 
 
