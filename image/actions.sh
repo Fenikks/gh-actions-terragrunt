@@ -246,11 +246,4 @@ mkdir -p $STEP_TMP_DIR/terraform_apply_error
 readonly STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR
 export STEP_TMP_DIR JOB_TMP_DIR WORKSPACE_TMP_DIR PLAN_OUT_DIR TG_CACHE_DIR
 
-echo "-------------------- DEBUG --------------------"
-echo "TG_CACHE_DIR is $TG_CACHE_DIR"
-echo "TF_PLUGIN_CACHE_DIR is $TF_PLUGIN_CACHE_DIR"
-echo "INPUT_USE_TF_PLUGIN_CACHE_FOLDER is $INPUT_USE_TF_PLUGIN_CACHE_FOLDER"
-echo "TF_IN_AUTOMATION is  $TF_IN_AUTOMATION"
-echo "-----------------------------------------------"
-
 trap fix_owners EXIT
